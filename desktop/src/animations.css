@@ -167,8 +167,75 @@
 
 
 /* ── Folder History（带 translateX 偏移的渐入）──
-   旧名：folderHistoryIn（独特：有 translateX(-50%)）*/
+    旧名：folderHistoryIn（独特：有 translateX(-50%)）*/
 @keyframes hana-folder-history-in {
     from { opacity: 0; transform: translateX(-50%) translateY(4px); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+
+/* ── Shimmer（骨架屏光泽扫过）──
+    用于 skeleton / placeholder 块，模拟内容加载中的感知性能 */
+@keyframes hana-shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+
+/* ── Message Enter（滑入 + 淡入 + 微缩放，消息列表专用）── */
+@keyframes hana-message-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* ── Typing Dots Bounce（弹跳点，用于输入指示器）── */
+@keyframes hana-typing-dot-bounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+/* ── Spinner Pulse（旋转 + 微缩放呼吸）──
+    在 hana-spin 基础上叠加 scale(0.95→1.05)，让 spinner 更有生命力 */
+@keyframes hana-spinner-pulse {
+    0%   { transform: rotate(0deg) scale(0.95); }
+    50%  { transform: rotate(180deg) scale(1.05); }
+    100% { transform: rotate(360deg) scale(0.95); }
+}
+
+
+/* ── Badge Pulse（计数变化时的微缩放弹跳）──
+    CSS-only: 添加 .pulse class 触发，适用于 badge/counter 数字变化 */
+@keyframes hana-badge-pulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+
+/* ── Reduced Motion ──
+    Respect user preference for reduced motion.
+    Disables all non-essential animations and transitions. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

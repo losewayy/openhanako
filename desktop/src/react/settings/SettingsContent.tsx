@@ -5,6 +5,8 @@ import { hanaFetch } from './api';
 import { createLocalServerConnection } from '../services/server-connection';
 import { t } from './helpers';
 import { loadAgents, loadAvatars, loadSettingsConfig, loadPluginSettings } from './actions';
+import { initAppearanceState } from './store';
+import { applyChatTypography } from '../editor/typography';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
@@ -22,6 +24,7 @@ import { PluginsTab } from './tabs/PluginsTab';
 import { PluginMarketplaceTab } from './tabs/PluginMarketplaceTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { SharingTab } from './tabs/SharingTab';
+import { TokenUsageTab } from './tabs/token-usage';
 import { getNativeSettingsTabComponent } from './native-settings-tabs';
 import { CropOverlay } from './overlays/CropOverlay';
 import { AgentCreateOverlay } from './overlays/AgentCreateOverlay';
@@ -49,6 +52,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   'plugin-marketplace': PluginMarketplaceTab,
   security: SecurityTab,
   about: AboutTab,
+  'token-usage': TokenUsageTab,
 };
 
 /** Tab 顶部大标题（对应左栏导航 label），所有 tab 都会显示 */
@@ -67,6 +71,7 @@ const TAB_TITLES: Record<string, string> = {
   'plugin-marketplace': '插件市场',
   security: '安全',
   about: '关于',
+  'token-usage': '用量',
 };
 
 function normalizeNativeTabForPlatform(tab: string, platformName: string | null | undefined): string {
@@ -205,7 +210,9 @@ export function SettingsContent({
               <h1 className={styles['settings-tab-title']}>{activeTabTitle}</h1>
             )}
             <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-              <ActiveTab />
+              <div className={styles['settings-tab-content']} key={effectiveActiveTab}>
+                <ActiveTab />
+              </div>
             </ErrorBoundary>
           </div>
         </div>
@@ -281,6 +288,9 @@ async function initSettings() {
 
     // config + plugin settings
     await Promise.all([loadSettingsConfig(), loadPluginSettings()]);
+
+    initAppearanceState();
+    applyChatTypography(useSettingsStore.getState().settingsConfig);
 
     store.set({ ready: true });
   } catch (err) {

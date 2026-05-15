@@ -5,13 +5,11 @@
  * 在 useEffect 中绑定 resize handle 事件，并在 unmount 时完整清理。
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useStore } from '../stores';
 
 export function useSidebarResize(): void {
-  const currentTab = useStore(s => s.currentTab);
-  const currentChannel = useStore(s => s.currentChannel);
-  const previewOpen = useStore(s => s.previewOpen);
+  const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -114,15 +112,23 @@ export function useSidebarResize(): void {
         document.body.classList.add('resizing');
 
         function onMove(e: MouseEvent): void {
-          const delta = isRight ? startX - e.clientX : e.clientX - startX;
-          const w = Math.max(min, Math.min(max, startW + delta));
-          liveWidth = w;
-          setWidth(w);
-          const rect = handle!.getBoundingClientRect();
-          handle!.style.setProperty('--handle-y', (e.clientY - rect.top) + 'px');
+          if (rafIdRef.current) return;
+          rafIdRef.current = requestAnimationFrame(() => {
+            const delta = isRight ? startX - e.clientX : e.clientX - startX;
+            const w = Math.max(min, Math.min(max, startW + delta));
+            liveWidth = w;
+            setWidth(w);
+            const rect = handle!.getBoundingClientRect();
+            handle!.style.setProperty('--handle-y', (e.clientY - rect.top) + 'px');
+            rafIdRef.current = null;
+          });
         }
 
         function onUp(): void {
+          if (rafIdRef.current) {
+            cancelAnimationFrame(rafIdRef.current);
+            rafIdRef.current = null;
+          }
           handle!.classList.remove('active');
           document.body.classList.remove('resizing');
           handle!.style.setProperty('--handle-y', '-999px');
@@ -193,5 +199,5 @@ export function useSidebarResize(): void {
     return () => {
       for (const cleanup of cleanupFns) cleanup();
     };
-  }, [currentTab, currentChannel, previewOpen]);
+  }, []);
 }

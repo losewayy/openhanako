@@ -22,6 +22,11 @@ interface DateParts {
   minute: number;
 }
 
+/** 验证 timestamp 是否为有效数字 */
+export function isValidTimestamp(value: ChatMessage['timestamp']): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
 function parseTimestamp(value: ChatMessage['timestamp']): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string') {
@@ -109,6 +114,48 @@ export function formatTimelineAnchorLabel(
   return isZh
     ? `${parts.year}年${parts.month}月${parts.day}日 ${time}`
     : `${parts.year}/${parts.month}/${parts.day} ${time}`;
+}
+
+/**
+ * 每条消息的时间标签
+ * 今天 → "HH:MM"
+ * 昨天 → "昨天 HH:MM" / "Yesterday HH:MM"
+ * 其他 → "YYYY-M-D HH:MM"
+ */
+export function formatMessageTime(
+  timestamp: number,
+  options: { locale?: string; timeZone?: string } = {},
+): string {
+  const locale = options.locale || (typeof window !== 'undefined' ? window.navigator?.language : 'en') || 'en';
+  const isZh = locale.toLowerCase().startsWith('zh');
+  const tz = options.timeZone;
+
+  const getDateParts = (d: Date) => {
+    if (tz) {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: 'numeric', day: 'numeric' })
+        .formatToParts(d);
+      const v: Record<string, number> = {};
+      for (const p of parts) v[p.type] = Number(p.value);
+      return { y: v.year, mo: v.month - 1, d: v.day };
+    }
+    return { y: d.getFullYear(), mo: d.getMonth(), d: d.getDate() };
+  };
+
+  const msgDate = new Date(timestamp);
+  const now = new Date();
+  const msg = getDateParts(msgDate);
+  const cur = getDateParts(now);
+
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const timeStr = `${pad2(msgDate.getHours())}:${pad2(msgDate.getMinutes())}`;
+
+  const sameDay = (a: typeof msg, b: typeof cur) => a.y === b.y && a.mo === b.mo && a.d === b.d;
+
+  if (sameDay(msg, cur)) return timeStr;
+  if (msg.y === cur.y && msg.mo === cur.mo && msg.d === cur.d - 1) {
+    return isZh ? `昨天 ${timeStr}` : `Yesterday ${timeStr}`;
+  }
+  return `${msg.y}-${msg.mo + 1}-${msg.d} ${timeStr}`;
 }
 
 export function buildTimelineAnchors(

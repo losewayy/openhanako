@@ -5,19 +5,51 @@
   justify-content: center;
   padding: 24px;
   min-height: 100px;
-  background: var(--bg-secondary, #f5f5f3);
+  background: var(--bg-secondary);
+}
+.errorIcon {
+  color: var(--danger);
+  animation: hana-shake 0.4s var(--ease-spring);
+  margin-bottom: 12px;
 }
 .message {
   font-size: 13px;
-  color: var(--text-secondary, #888);
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 .retry {
   background: none;
-  border: 1px solid var(--border-light, #ddd);
-  border-radius: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 3px 12px;
   font-size: 12px;
   cursor: pointer;
-  color: var(--text-secondary, #888);
+  color: var(--text-secondary);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              background-color var(--duration-fast) var(--ease-out);
+}
+.retry:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+.retry:active {
+  transform: scale(0.96);
+  transition-duration: var(--duration-instant);
+}
+.retry:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .errorIcon {
+    animation: none;
+  }
+  .retry {
+    transition: none;
+  }
+  .retry:hover {
+    background: none;
+    color: var(--text-secondary);
+  }
 }

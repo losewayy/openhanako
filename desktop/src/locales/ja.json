@@ -614,7 +614,8 @@
       "sharing": "共有",
       "plugins": "プラグイン",
       "about": "概要",
-      "security": "セキュリティ"
+      "security": "セキュリティ",
+      "tokenUsage": "使用量"
     },
     "computerUse": {
       "title": "Computer Use",
@@ -693,6 +694,15 @@
       "markdownContentPadding": "本文余白",
       "markdownContentPaddingHint": "エディター本文の左右余白を調整します。"
     },
+    "chat": {
+      "title": "チャットエリア",
+      "chatMaxWidth": "メッセージ最大幅",
+      "chatMaxWidthHint": "チャットメッセージエリアの最大幅（px）。",
+      "chatFontSize": "フォントサイズ",
+      "chatFontSizeHint": "チャットメッセージのフォントサイズ（rem）。",
+      "chatLineHeight": "行の高さ",
+      "chatLineHeightHint": "チャットメッセージの行間を調整します。"
+    },
     "locale": {
       "title": "言語と地域",
       "language": "言語",
@@ -745,12 +755,30 @@
         "title": "ツール",
         "description": "ツールの切り替えは、会話を再開するか新しく始めた後に反映されます。進行中の会話は開始時のツールセットを使い続けます。",
         "items": {
-          "browser": { "label": "ブラウザ", "summary": "ヘッドレスブラウザを操作してウェブを閲覧" },
-          "computer": { "label": "Computer Use", "summary": "承認済みのデスクトップアプリを操作し、動作カーソルを表示します" },
-          "cron": { "label": "定期実行", "summary": "指定した時刻にタスクを自動実行" },
-          "dm": { "label": "ダイレクトメッセージ", "summary": "別のエージェントに 1 対 1 のメッセージを送信" },
-          "install_skill": { "label": "スキルをインストール", "summary": "GitHub またはスキルライブラリから新しいスキルをインストール" },
-          "update_settings": { "label": "設定を変更", "summary": "Agent にアプリ設定の変更を許可" }
+          "browser": {
+            "label": "ブラウザ",
+            "summary": "ヘッドレスブラウザを操作してウェブを閲覧"
+          },
+          "computer": {
+            "label": "Computer Use",
+            "summary": "承認済みのデスクトップアプリを操作し、動作カーソルを表示します"
+          },
+          "cron": {
+            "label": "定期実行",
+            "summary": "指定した時刻にタスクを自動実行"
+          },
+          "dm": {
+            "label": "ダイレクトメッセージ",
+            "summary": "別のエージェントに 1 対 1 のメッセージを送信"
+          },
+          "install_skill": {
+            "label": "スキルをインストール",
+            "summary": "GitHub またはスキルライブラリから新しいスキルをインストール"
+          },
+          "update_settings": {
+            "label": "設定を変更",
+            "summary": "Agent にアプリ設定の変更を許可"
+          }
         }
       },
       "computerUse": {
@@ -1301,6 +1329,21 @@
         "上の入力欄に App ID と App Secret を貼り付けてスイッチをオンにします"
       ],
       "whatsappHint": "近日対応予定"
+    },
+    "tokenUsage": {
+      "title": "Token 使用量",
+      "totalCalls": "総呼び出し回数",
+      "promptTokens": "入力 Token",
+      "completionTokens": "出力 Token",
+      "totalTokens": "総消費",
+      "modelTrend": "モデル使用量推移",
+      "tokenTypeTrend": "Token タイプ推移",
+      "byModel": "モデル別",
+      "byDate": "日付別",
+      "date": "日付",
+      "model": "モデル",
+      "noData": "データなし",
+      "loadFailed": "読み込み失敗"
     }
   },
   "onboarding": {
@@ -1715,7 +1758,8 @@
     "settingsApplyFailed": "設定変更に失敗しました: {msg}",
     "settingsCancelled": "ユーザーが「{label}」の変更をキャンセルしました",
     "settingsTimeout": "「{label}」の変更確認がタイムアウトしました。設定は変更されていません",
-    "subagentMaxConcurrent": "現在 {max} 個のサブエージェントが実行中です。完了をお待ちください。",
+    "subagentMaxConcurrent": "このセッションで {max} 個のサブエージェントが実行中です。完了をお待ちください。",
+    "subagentMaxGlobal": "システム全体で {max} 個のサブエージェントが実行中です。完了をお待ちください。",
     "subagentFailed": "サブエージェントの実行に失敗しました: {msg}",
     "subagentTimeout": "サブエージェントがタイムアウトしました（{minutes}分）",
     "subagentAborted": "サブエージェントが中止されました",

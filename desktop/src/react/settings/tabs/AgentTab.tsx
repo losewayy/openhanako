@@ -11,6 +11,7 @@ import { YuanSelector } from './agent/YuanSelector';
 import { MemorySection } from './agent/AgentMemory';
 import { AgentToolsSection } from './agent/AgentToolsSection';
 import { CharacterCardPreviewOverlay, type CharacterCardPlan } from '../overlays/CharacterCardPreviewOverlay';
+import { EmptyState } from '../../components/EmptyState';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
 import { Toggle } from '../widgets/Toggle';
@@ -362,9 +363,9 @@ export function AgentTab() {
         />
         <div style={{ padding: 'var(--space-sm) var(--space-md)' }}>
           {!experienceEnabled ? (
-            <div className={styles['exp-empty']}>{t('settings.experience.paused')}</div>
+            <EmptyState title={t('settings.experience.paused')} className={styles['exp-empty']} />
           ) : expCategories.length === 0 ? (
-            <div className={styles['exp-empty']}>{t('settings.experience.empty')}</div>
+            <EmptyState title={t('settings.experience.empty')} className={styles['exp-empty']} />
           ) : (
             <div className={styles['exp-list']}>
               {expCategories.map((cat) => (

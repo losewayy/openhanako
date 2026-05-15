@@ -5,7 +5,7 @@
  */
 
 import type { PreviewItem } from '../types';
-import { openPreview } from '../stores/preview-actions';
+import { openPreview, setMarkdownPreviewActive } from '../stores/preview-actions';
 import { inferKindByExt, isMediaKind } from './file-kind';
 import { openMediaViewerFromContext } from './open-media-viewer';
 import { showError } from './ui-helpers';
@@ -100,10 +100,10 @@ export async function openFilePreview(
           content: body,
         };
         openPreview(previewItem);
+        setMarkdownPreviewActive(previewItem.id, true);
         return;
       }
       // 读取失败（可能是 zip 格式），尝试 skill viewer
-      window.platform?.openSkillViewer?.({ skillPath: filePath });
       return;
     }
 
@@ -139,6 +139,9 @@ export async function openFilePreview(
           language: previewType === 'code' ? ext : undefined,
         };
         openPreview(previewItem);
+        if (previewType === 'markdown') {
+          setMarkdownPreviewActive(previewItem.id, true);
+        }
         return;
       }
     }
@@ -174,6 +177,7 @@ export async function openSkillPreview(skillName: string, skillFilePath: string)
         content: body,
       };
       openPreview(previewItem);
+      setMarkdownPreviewActive(previewItem.id, true);
     }
   } catch (err) {
     console.error('[file-preview] open skill preview failed:', err);

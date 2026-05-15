@@ -9,6 +9,7 @@ import { memo, useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStore } from '../../stores';
 import { loadMoreMessages } from '../../stores/session-actions';
 import { useContinuousBottomScroll } from '../../hooks/use-continuous-bottom-scroll';
+import { useI18n } from '../../hooks/use-i18n';
 
 const EMPTY_ITEMS: ChatListItem[] = [];
 import type { ChatListItem } from '../../stores/chat-types';
@@ -94,6 +95,8 @@ const Panel = memo(function Panel({ path, active }: { path: string; active: bool
       messageElementsRef.current.delete(messageId);
     }
   }, []);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const { t } = useI18n();
 
   // scroll 事件维护 sticky 标志 + 上滑加载更多 + 滚动中显现 scrollbar
   useEffect(() => {
@@ -105,6 +108,7 @@ const Panel = memo(function Panel({ path, active }: { path: string; active: bool
       if (active) setScrollButton(el, !sticky, () => {
         bottomScroll.scrollToBottom({ mode: 'follow', forceSticky: true });
       });
+      if (sticky && hasNewMessage) setHasNewMessage(false);
       // 触顶加载更多
       if (el.scrollTop < LOAD_MORE_THRESHOLD) {
         const session = useStore.getState().chatSessions[path];
@@ -172,14 +176,24 @@ const Panel = memo(function Panel({ path, active }: { path: string; active: bool
       const last = items[items.length - 1];
       if (last?.type === 'message' && last.data.role === 'user') {
         bottomScroll.scrollToBottom({ mode: 'instant', forceSticky: true });
+        setHasNewMessage(false);
       } else {
-        bottomScroll.followBottom();
+        if (bottomScroll.checkSticky()) {
+          bottomScroll.scrollToBottom({ mode: 'instant', forceSticky: true });
+        } else {
+          setHasNewMessage(true);
+        }
       }
     }
     prevLen.current = items.length;
   }, [items, items.length, active, bottomScroll]);
 
   if (items.length === 0) return null;
+
+  const handleNewMessageClick = () => {
+    bottomScroll.scrollToBottom({ mode: 'follow', forceSticky: true });
+    setHasNewMessage(false);
+  };
 
   return (
     <div
@@ -216,6 +230,14 @@ const Panel = memo(function Panel({ path, active }: { path: string; active: bool
         messageElementsRef={messageElementsRef}
         active={active}
       />
+      {hasNewMessage && (
+        <button className={styles.newMessageIndicator} onClick={handleNewMessageClick}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+          {t('channel.newMessages')}
+        </button>
+      )}
     </div>
   );
 });

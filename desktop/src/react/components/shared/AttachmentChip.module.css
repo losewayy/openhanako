@@ -10,7 +10,7 @@
     background: var(--bg-card);
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-md);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
     max-width: 185px;
 }
 
@@ -70,4 +70,15 @@
 
 .remove:hover {
     opacity: 1;
+}
+
+.remove:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .remove:focus-visible {
+        outline: none;
+    }
 }

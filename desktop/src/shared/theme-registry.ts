@@ -5,6 +5,8 @@ export interface ThemeEntry {
   backgroundColor: string;
   i18nName: string;
   i18nMode: string;
+  group?: 'functional' | 'personalized';
+  i18nDescription?: string;
 }
 
 export type ThemeId = keyof typeof data.themes;

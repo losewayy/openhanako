@@ -37,7 +37,10 @@
     background: var(--bg-card, var(--bg));
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-lg, 12px);
-    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.04),
+      0 12px 24px rgba(0,0,0,0.08),
+      0 24px 48px rgba(0,0,0,0.14);
     overflow: hidden;
     animation: hana-slide-in-left var(--duration-slow) var(--ease-out) both;
 }
@@ -69,7 +72,7 @@
     cursor: pointer;
     padding: 4px;
     border-radius: var(--radius-sm);
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast) var(--ease-out);
     display: flex;
     align-items: center;
 }
@@ -111,7 +114,7 @@
     font-size: 0.75rem;
     padding: 3px 6px;
     border-radius: var(--radius-sm);
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast) var(--ease-out);
 }
 
 .floatingPanelBack:hover {
@@ -224,7 +227,7 @@
     cursor: pointer;
     margin-left: auto;
     margin-right: var(--space-sm);
-    transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast) var(--ease-out);
     white-space: nowrap;
 }
 
@@ -266,7 +269,7 @@
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-md);
     background: var(--bg);
-    transition: border-color var(--duration-fast);
+    transition: border-color var(--duration-fast) var(--ease-out);
     font-family: inherit;
 }
 
@@ -367,7 +370,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: color var(--duration-slow), border-color var(--duration-slow);
+    transition: color var(--duration-slow), border-color var(--duration-slow) var(--ease-out);
 }
 
 .autoModelPill:hover,
@@ -378,7 +381,7 @@
 
 .autoModelArrow {
     font-size: 0.5rem;
-    transition: transform var(--duration-slow);
+    transition: transform var(--duration-slow) var(--ease-out);
 }
 
 .autoModelOpen .autoModelArrow {
@@ -390,11 +393,15 @@
     min-width: 140px;
     max-height: calc(5 * 1.9rem + 8px);
     overflow-y: auto;
+    scroll-behavior: smooth;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 4px;
-    box-shadow: 0 4px 12px var(--shadow);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.08),
+      0 16px 32px rgba(0,0,0,0.12);
 }
 
 .autoModelOption {
@@ -430,7 +437,7 @@
     gap: 2px;
     flex-shrink: 0;
     opacity: 0;
-    transition: opacity var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .autoItem:hover .autoItemActions {
@@ -446,7 +453,7 @@
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast) var(--ease-out);
 }
 
 .autoItemBtn:hover {
@@ -472,7 +479,7 @@
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-md);
     padding: var(--space-md);
-    transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast) var(--ease-out);
     background: var(--bg-card, var(--bg));
 }
 
@@ -551,7 +558,7 @@
     color: var(--accent);
     font-size: 0.68rem;
     opacity: 0;
-    transition: opacity var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .actCard:hover .actCardViewHint {
@@ -597,7 +604,7 @@
     font-size: 0.72rem;
     padding: 3px 10px;
     cursor: pointer;
-    transition: all var(--duration-fast);
+    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .readonlyBackBtn:hover {
@@ -633,7 +640,7 @@
     cursor: pointer;
     font-size: 0.78rem;
     color: var(--text);
-    transition: background var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
 .bridgeAgentBtn:hover {
@@ -670,11 +677,15 @@
     background: var(--bg-card, #fff);
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-sm);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.08),
+      0 16px 32px rgba(0,0,0,0.12);
     min-width: 160px;
     padding: 4px 0;
     max-height: 240px;
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .bridgeAgentMenuItem {
@@ -718,7 +729,7 @@
     border: none;
     cursor: pointer;
     border-radius: var(--radius-sm);
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast) var(--ease-out);
 }
 
 .bridgeTab:hover {
@@ -751,6 +762,7 @@
     flex-shrink: 0;
     border-right: 1px solid var(--overlay-light);
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .bridgeContactList {
@@ -946,7 +958,7 @@
     inset: 0;
     z-index: 10;
     background: color-mix(in srgb, var(--bg) 75%, transparent);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -984,7 +996,7 @@
     color: var(--text-muted);
     font-size: 0.8rem;
     cursor: pointer;
-    transition: background var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
 .bridgeOverlayBtn:hover {

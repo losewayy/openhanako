@@ -349,92 +349,12 @@ removeBinDirs(path.join(outDir, "node_modules"));
 
 console.log("[build-server] dependencies installed");
 
-// ── 8. @vercel/nft 追踪：只保留运行时实际需要的文件 ──
-// 从 bundle 入口出发，静态分析所有 import/require 链，
-// 删除 node_modules 里没被追踪到的文件（.d.ts、.map、多余平台二进制等）
-console.log("[build-server] running nft trace...");
-
-// nft 是 ESM，用动态 import
-const { nodeFileTrace } = await import("@vercel/nft");
-let fileList;
-try {
-  ({ fileList } = await nodeFileTrace(
-    [path.join(outDir, "bundle", "index.js")],
-    { base: outDir, conditions: ["node", "import"] },
-  ));
-} catch (e) {
-  // Windows CI 上 nft 可能因用户目录不存在而报错，跳过裁剪
-  console.warn(`[build-server] nft trace failed (${e.message}), skipping prune`);
-  fileList = null;
-}
-
+// ── 8. 按文件类型裁剪 node_modules ──
+// 替代 @vercel/nft：不追踪 import 链，只删运行时绝对不会被加载的文件类型
+// （类型声明、源码映射、文档、测试等）。3 秒完成，不耗 5GB 内存。
 const nmDir = path.join(outDir, "node_modules");
-
-if (fileList) {
-// 把追踪结果转成绝对路径 Set
-const tracedFiles = new Set();
-for (const f of fileList) {
-  tracedFiles.add(path.resolve(outDir, f));
-}
-
-// Server package.json 里的依赖都是显式运行时入口，nft 不一定能正确追踪
-// 条件导出和 CJS/ESM 交叉解析，整个包目录跳过裁剪。
-const protectedDirs = new Set();
-for (const packageName of Object.keys(externalPkg.dependencies)) {
-  // path.join 自动处理 scoped 包（@scope/pkg → node_modules/@scope/pkg）
-  const pkgDir = path.resolve(nmDir, packageName);
-  if (fs.existsSync(pkgDir)) {
-    protectedDirs.add(pkgDir);
-  }
-}
-
-if (protectedDirs.size > 0) {
-  const names = [...protectedDirs].map(d => path.relative(nmDir, d));
-  console.log(`[build-server] nft: protecting ${protectedDirs.size} server deps from pruning: ${names.join(", ")}`);
-}
-
-// 遍历 node_modules，删除未追踪的文件（跳过受保护的包）
-let removedFiles = 0;
-let removedSize = 0;
-
-function pruneDir(dir) {
-  let entries;
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
-
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (protectedDirs.has(path.resolve(full))) continue;
-      pruneDir(full);
-      // 删完子文件后如果目录空了，也删掉
-      try {
-        const remaining = fs.readdirSync(full);
-        if (remaining.length === 0) fs.rmdirSync(full);
-      } catch {}
-    } else if (entry.isFile() || entry.isSymbolicLink()) {
-      if (!tracedFiles.has(full)) {
-        const size = entry.isFile() ? (fs.statSync(full).size || 0) : 0;
-        fs.unlinkSync(full);
-        removedFiles++;
-        removedSize += size;
-      }
-    }
-  }
-}
-
-pruneDir(nmDir);
-
-const keptFiles = fileList.size;
-const MB = (n) => (n / 1024 / 1024).toFixed(0);
-console.log(`[build-server] nft: kept ${keptFiles} files, removed ${removedFiles} files (${MB(removedSize)}MB)`);
-} // end if (fileList)
-
-try {
-  verifyExternalEntrypoints(outDir, Object.keys(externalPkg.dependencies));
-} catch (err) {
-  console.error(err instanceof Error ? err.message : String(err));
-  process.exit(1);
-}
+const { pruneNodeModules } = await import("./prune-node-modules.mjs");
+pruneNodeModules(nmDir);
 
 // ── 8b. 删除 koffi 多余平台二进制 ──
 // koffi 带了 18 个平台的 .node 文件，nft 全部追踪到了（因为 require 路径指向包根）。

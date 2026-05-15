@@ -21,7 +21,7 @@ import { refreshPluginUI } from './stores/plugin-ui-actions';
 import { openSettingsModal } from './stores/settings-modal-actions';
 import { configureAppEventActions, handleAppEvent, readConfigCwdHistory, readConfigHomeFolder, readConfigMemoryMasterEnabled } from './services/app-event-actions';
 import { configureWsMessageHandler } from './services/ws-message-handler';
-import { applyEditorTypography } from './editor/typography';
+import { applyEditorTypography, applyChatTypography } from './editor/typography';
 import { createLocalServerConnection, hasServerConnection, mergeServerIdentity } from './services/server-connection';
 // @ts-expect-error — shared JS module
 import { errorBus as _errorBus } from '../../../shared/error-bus.js';
@@ -105,6 +105,7 @@ export async function initApp(): Promise<void> {
     const healthData = await healthRes.json();
     const configData = await configRes.json();
     applyEditorTypography(configData.editor);
+    applyChatTypography(configData);
 
     // 3. 加载 i18n
     await i18n.load(configData.locale || 'zh-CN');

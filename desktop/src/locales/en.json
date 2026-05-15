@@ -617,7 +617,8 @@
       "sharing": "Sharing",
       "plugins": "Plugins",
       "about": "About",
-      "security": "Security"
+      "security": "Security",
+      "tokenUsage": "Usage"
     },
     "appearance": {
       "title": "Appearance",
@@ -650,7 +651,19 @@
       "paperTextureHint": "Add a rice paper texture to the background",
       "paperTextureDarkDisabledHint": "Paper texture is unavailable in night themes and will return with your saved setting in light themes",
       "leavesOverlay": "Sunny Mode",
-      "leavesOverlayHint": "Go touch some grass (and sunlight)"
+      "leavesOverlayHint": "Go touch some grass (and sunlight)",
+      "groupFunctional": "Functional",
+      "groupPersonalized": "Personalized",
+      "warmPaperDesc": "Classic warm paper light theme",
+      "midnightDesc": "Dark theme with teal-rose palette",
+      "highContrastDesc": "High contrast for enhanced readability",
+      "grassAromaDesc": "Fresh green natural tones",
+      "contemplationDesc": "Cool gray contemplative tones",
+      "absolutelyDesc": "Warm white minimalist tones",
+      "delveDesc": "Pure white minimal design",
+      "deepThinkDesc": "Cool white focused tones",
+      "newWarmPaperDesc": "Default light theme with warm paper tones",
+      "midnightContrastDesc": "High contrast dark theme"
     },
     "editor": {
       "title": "Editor",
@@ -672,6 +685,15 @@
       "markdownLineHeightHint": "Controls vertical rhythm inside the editor.",
       "markdownContentPadding": "Content Padding",
       "markdownContentPaddingHint": "Controls left and right padding for editor content."
+    },
+    "chat": {
+      "title": "Chat Area",
+      "chatMaxWidth": "Max Message Width",
+      "chatMaxWidthHint": "Maximum width of chat message area (px).",
+      "chatFontSize": "Font Size",
+      "chatFontSizeHint": "Font size for chat messages (rem).",
+      "chatLineHeight": "Line Height",
+      "chatLineHeightHint": "Vertical distance between lines in chat messages."
     },
     "locale": {
       "title": "Language & Region",
@@ -750,12 +772,30 @@
         "title": "Tools",
         "description": "Tool switches take effect after restarting or starting a conversation. Active conversations keep using the tool set they started with.",
         "items": {
-          "browser": { "label": "Browser", "summary": "Control a headless browser to navigate web pages" },
-          "computer": { "label": "Computer Use", "summary": "Control approved desktop apps with a visible action overlay" },
-          "cron": { "label": "Scheduled Tasks", "summary": "Run tasks automatically at specified times" },
-          "dm": { "label": "Direct Message", "summary": "Send a one-on-one message to another agent" },
-          "install_skill": { "label": "Install Skill", "summary": "Install new skills from GitHub or the skill library" },
-          "update_settings": { "label": "Update Settings", "summary": "Allow the agent to modify application configuration" }
+          "browser": {
+            "label": "Browser",
+            "summary": "Control a headless browser to navigate web pages"
+          },
+          "computer": {
+            "label": "Computer Use",
+            "summary": "Control approved desktop apps with a visible action overlay"
+          },
+          "cron": {
+            "label": "Scheduled Tasks",
+            "summary": "Run tasks automatically at specified times"
+          },
+          "dm": {
+            "label": "Direct Message",
+            "summary": "Send a one-on-one message to another agent"
+          },
+          "install_skill": {
+            "label": "Install Skill",
+            "summary": "Install new skills from GitHub or the skill library"
+          },
+          "update_settings": {
+            "label": "Update Settings",
+            "summary": "Allow the agent to modify application configuration"
+          }
         }
       },
       "computerUse": {
@@ -1341,6 +1381,21 @@
         "Paste the App ID and App Secret into the input fields above and turn on the switch"
       ],
       "whatsappHint": "Coming soon"
+    },
+    "tokenUsage": {
+      "title": "Token Usage",
+      "totalCalls": "Total Calls",
+      "promptTokens": "Input Token",
+      "completionTokens": "Output Token",
+      "totalTokens": "Total",
+      "modelTrend": "Model Usage Trend",
+      "tokenTypeTrend": "Token Type Trend",
+      "byModel": "By Model",
+      "byDate": "By Date",
+      "date": "Date",
+      "model": "Model",
+      "noData": "No usage data yet",
+      "loadFailed": "Failed to load"
     }
   },
   "onboarding": {
@@ -1755,7 +1810,8 @@
     "settingsApplyFailed": "Settings change failed: {msg}",
     "settingsCancelled": "User cancelled change of \"{label}\"",
     "settingsTimeout": "\"{label}\" change confirmation timed out, no changes made",
-    "subagentMaxConcurrent": "{max} sub-agents are already running, please wait before starting new ones.",
+    "subagentMaxConcurrent": "This session already has {max} sub-agents running, please wait before starting new ones.",
+    "subagentMaxGlobal": "System wide limit of {max} concurrent sub-agents reached, please wait before starting new ones.",
     "subagentFailed": "Sub-agent execution failed: {msg}",
     "subagentTimeout": "Sub-agent timed out after {minutes} minutes",
     "subagentAborted": "Sub-agent was aborted",

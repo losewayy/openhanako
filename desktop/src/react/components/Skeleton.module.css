@@ -1,0 +1,33 @@
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--overlay-light);
+    border-radius: var(--radius-sm);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    animation: hana-shimmer 2s infinite;
+}
+
+.skeleton-text {
+    height: 1em;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+.skeleton-rect {
+    border-radius: var(--radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+        animation: none;
+    }
+}

@@ -14,6 +14,18 @@
   vertical-align: middle;
   user-select: none;
   margin-right: 0.3rem;
+  transition: transform var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge:active {
+  transform: translateY(0) scale(0.96);
+  transition-duration: var(--duration-instant);
 }
 
 .icon {
@@ -31,15 +43,21 @@
   width: 14px;
   height: 14px;
   margin-left: 0.1rem;
-  padding: 0;
   border: none;
   background: none;
   color: inherit;
   opacity: 0.45;
   cursor: pointer;
-  transition: opacity var(--duration-instant);
+  transition: opacity var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
+  border-radius: 2px;
 }
 
 .remove:hover {
   opacity: 1;
+  transform: scale(1.15);
+}
+
+.remove:active {
+  transform: scale(0.85);
+  transition-duration: var(--duration-instant);
 }

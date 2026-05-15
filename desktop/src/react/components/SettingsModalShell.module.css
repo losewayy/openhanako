@@ -1,8 +1,9 @@
 .overlay {
-  --settings-modal-open-dur: var(--duration-slow);
-  --settings-modal-close-dur: var(--duration-fast);
-  --settings-modal-scale: 0.96;
-  --settings-modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --settings-modal-open-dur: 0.35s;
+  --settings-modal-open-ease: cubic-bezier(0.2, 0, 0, 1);
+  --settings-modal-close-dur: 0.15s;
+  --settings-modal-scale: 0.98;
+  --settings-modal-translate: 8px;
   position: fixed;
   inset: 0;
   z-index: 1800;
@@ -10,31 +11,27 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  background:
-    radial-gradient(circle at 50% 42%, rgba(248, 245, 237, 0.1), rgba(20, 18, 14, 0.16) 62%, rgba(20, 18, 14, 0.24)),
-    rgba(20, 18, 14, 0.2);
+  background: rgba(20, 18, 14, 0);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   opacity: 0;
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
   transition:
-    opacity var(--settings-modal-open-dur) var(--settings-modal-ease),
-    backdrop-filter var(--settings-modal-open-dur) var(--settings-modal-ease),
-    -webkit-backdrop-filter var(--settings-modal-open-dur) var(--settings-modal-ease);
+    opacity var(--settings-modal-open-dur) var(--settings-modal-open-ease),
+    background var(--settings-modal-open-dur) var(--settings-modal-open-ease);
   -webkit-app-region: no-drag;
 }
 
 .overlay.open {
+  background: rgba(20, 18, 14, 0.18);
   opacity: 1;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 .overlay.closing {
   opacity: 0;
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
+  background: rgba(20, 18, 14, 0);
   pointer-events: none;
   transition-duration: var(--settings-modal-close-dur);
+  transition-timing-function: var(--ease-out);
 }
 
 .card {
@@ -46,18 +43,18 @@
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--overlay-light);
-  border-radius: var(--radius-lg, 4px);
+  border-radius: var(--radius-lg, 12px);
   box-shadow:
-    0 26px 70px rgba(20, 18, 14, 0.18),
-    0 8px 24px rgba(20, 18, 14, 0.12);
+    0 32px 80px rgba(20, 18, 14, 0.22),
+    0 12px 32px rgba(20, 18, 14, 0.14),
+    0 0 0 0.5px rgba(255, 255, 255, 0.05) inset;
   opacity: 0;
-  transform: scale(var(--settings-modal-scale));
+  transform: translateY(var(--settings-modal-translate)) scale(var(--settings-modal-scale));
   transform-origin: center;
   pointer-events: none;
   transition:
-    transform var(--settings-modal-open-dur) var(--settings-modal-ease),
-    opacity var(--settings-modal-open-dur) var(--settings-modal-ease);
-  will-change: transform, opacity;
+    transform var(--settings-modal-open-dur) var(--settings-modal-open-ease),
+    opacity var(--settings-modal-open-dur) var(--settings-modal-open-ease);
 }
 
 .card[data-wide="true"] {
@@ -66,15 +63,16 @@
 
 .card.open {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
 .card.closing {
   opacity: 0;
-  transform: scale(var(--settings-modal-scale));
+  transform: translateY(var(--settings-modal-translate)) scale(var(--settings-modal-scale));
   pointer-events: none;
   transition-duration: var(--settings-modal-close-dur);
+  transition-timing-function: var(--ease-out);
 }
 
 @media (max-width: 760px) {

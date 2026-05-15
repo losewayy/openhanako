@@ -8,7 +8,7 @@
     background: var(--bg-card, var(--bg));
     border-radius: var(--radius-sm);
     padding: 2px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 .actionBtn {
@@ -22,15 +22,22 @@
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background var(--duration-instant), color var(--duration-instant);
+    transition: background var(--duration-instant), color var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .actionBtn:hover {
     background: var(--overlay-light);
     color: var(--text);
+    transform: translateY(-1px);
+}
+
+.actionBtn:active {
+    transform: translateY(0) scale(0.94);
+    transition-duration: var(--duration-instant);
 }
 
 .actionBtnActive {
     background: var(--overlay-light);
     color: var(--text);
+    transform: none;
 }

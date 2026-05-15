@@ -17,6 +17,16 @@ export interface EditorTypography {
   markdown: EditorMarkdownTypography;
 }
 
+export interface ChatTypography {
+  chatMaxWidth: number;
+  chatFontSize: number;
+  chatLineHeight: number;
+}
+
+export interface ChatTypographyConfig {
+  chat: ChatTypography;
+}
+
 export const DEFAULT_EDITOR_TYPOGRAPHY: EditorTypography = sharedEditorTypography.DEFAULT_EDITOR_TYPOGRAPHY;
 
 export function normalizeEditorTypography(value: unknown): EditorTypography {
@@ -45,6 +55,30 @@ export function applyEditorTypography(
   root.style.setProperty('--editor-markdown-h6-font-size', `${markdown.heading6FontSize}px`);
   root.style.setProperty('--editor-markdown-line-height', String(markdown.lineHeight));
   root.style.setProperty('--editor-markdown-content-padding-x', `${markdown.contentPadding}px`);
+
+  return typography;
+}
+
+export function normalizeChatTypography(value: unknown): ChatTypographyConfig {
+  return sharedEditorTypography.normalizeChatTypography(value);
+}
+
+export function mergeChatTypography(base: unknown, patch: unknown): ChatTypographyConfig {
+  return sharedEditorTypography.mergeChatTypography(base, patch);
+}
+
+export function applyChatTypography(
+  value: unknown,
+  root: HTMLElement | null = typeof document === 'undefined' ? null : document.documentElement,
+): ChatTypographyConfig {
+  const typography = normalizeChatTypography(value);
+  const { chat } = typography;
+
+  if (!root?.style) return typography;
+
+  root.style.setProperty('--chat-max-width', `${chat.chatMaxWidth}px`);
+  root.style.setProperty('--chat-font-size', `${chat.chatFontSize}rem`);
+  root.style.setProperty('--chat-line-height', String(chat.chatLineHeight));
 
   return typography;
 }

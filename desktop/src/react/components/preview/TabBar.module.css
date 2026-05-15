@@ -34,19 +34,26 @@
     white-space: nowrap;
     max-width: 160px;
     flex-shrink: 0;
-    transition: color var(--duration-instant), background var(--duration-instant), border-color var(--duration-instant), box-shadow var(--duration-instant);
+    transition: color var(--duration-instant), background var(--duration-instant), border-color var(--duration-instant), box-shadow var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .tab:hover {
     color: var(--text);
     background: var(--overlay-subtle);
+    transform: translateY(-1px);
+}
+
+.tab:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 .tabActive {
     color: var(--text);
     background: var(--bg-card);
     border-color: var(--overlay-light);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
+    transform: none;
 }
 
 .tabTitle {
@@ -67,13 +74,19 @@
     opacity: 0.35;
     flex-shrink: 0;
     border-radius: calc(var(--radius-md) - 2px);
-    transition: opacity var(--duration-instant), background var(--duration-instant), color var(--duration-instant);
+    transition: opacity var(--duration-instant), background var(--duration-instant), color var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .tabClose:hover {
     opacity: 1;
-    color: #C0392B;
+    color: var(--danger, #C0392B);
     background: rgba(192, 57, 43, 0.1);
+    transform: scale(1.1);
+}
+
+.tabClose:active {
+    transform: scale(0.85);
+    transition-duration: var(--duration-instant);
 }
 
 .tabActive .tabClose {
@@ -95,10 +108,16 @@
     align-items: center;
     justify-content: center;
     opacity: 0.5;
-    transition: opacity var(--duration-instant), background var(--duration-instant);
+    transition: opacity var(--duration-instant), background var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .closePanel:hover {
     opacity: 1;
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.closePanel:active {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }

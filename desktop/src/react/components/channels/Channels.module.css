@@ -22,8 +22,8 @@
     border-radius: var(--radius-sm);
     background: var(--tab-slider-bg, var(--bg-card));
     box-shadow: var(--tab-slider-shadow, 0 1px 3px var(--shadow));
-    transition: transform var(--duration-slow) cubic-bezier(0.4, 0, 0.2, 1),
-                width var(--duration-slow) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1),
+                width 0.25s cubic-bezier(0.2, 0, 0, 1);
     z-index: 0;
 }
 
@@ -90,6 +90,7 @@
 .channelList {
     flex: 1;
     overflow-y: auto;
+    scroll-behavior: smooth;
     padding: 0 var(--space-sm) 42px;
 }
 
@@ -165,11 +166,18 @@
     margin-bottom: 1px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelItem:hover {
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.channelItem:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: var(--duration-instant);
 }
 
 .channelItemActive {
@@ -326,12 +334,18 @@
     cursor: pointer;
     padding: 4px;
     border-radius: var(--radius-sm);
-    transition: background var(--duration-fast), color var(--duration-fast);
+    transition: background var(--duration-fast), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelHeaderActionBtn:hover {
     background: var(--overlay-light);
     color: var(--text);
+    transform: translateY(-1px);
+}
+
+.channelHeaderActionBtn:active {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 /* ── IM 风格消息 ── */
@@ -462,14 +476,27 @@
     border-radius: var(--radius-sm);
     background: var(--bg-card);
     color: var(--accent);
-    box-shadow: 0 4px 14px var(--shadow);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.08);
     font-size: 0.78rem;
     cursor: pointer;
     z-index: 2;
+    transition: background var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring),
+                box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .channelNewMessagesBtn:hover {
     background: rgba(var(--accent-rgb), 0.08);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.channelNewMessagesBtn:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
+    box-shadow: var(--shadow-sm);
 }
 
 /* ── 频道输入区 ── */
@@ -486,13 +513,13 @@
     border-radius: var(--radius-lg);
     padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
     box-shadow: 0 2px 6px var(--shadow);
-    transition: border-color 0.5s var(--ease-out),
-                box-shadow 0.5s var(--ease-out);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .channelInputWrapper:focus-within {
-    border-color: rgba(0, 0, 0, 0.10);
-    box-shadow: 0 3px 10px var(--shadow);
+    border-color: var(--accent);
+    box-shadow: 0 3px 10px var(--shadow), 0 0 0 2px rgba(var(--accent-rgb), 0.08);
 }
 
 /* @ 联想下拉框 */
@@ -505,9 +532,12 @@
     background: var(--bg-card, var(--bg));
     border: 1px solid var(--overlay-medium);
     border-radius: var(--radius-md);
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.08);
     max-height: 160px;
     overflow-y: auto;
+    scroll-behavior: smooth;
     z-index: 50;
 }
 
@@ -519,12 +549,18 @@
     cursor: pointer;
     font-size: 13px;
     color: var(--text-primary);
-    transition: background var(--duration-instant);
+    transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelMentionItem:hover,
 .channelMentionItemActive {
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.channelMentionItem:active {
+    transform: translateY(0) scale(0.98);
+    transition: transform var(--duration-instant);
 }
 
 .channelMentionAvatar {
@@ -560,9 +596,10 @@
     outline: none;
     max-height: 120px;
     overflow-y: auto;
+    scroll-behavior: smooth;
     scrollbar-width: none;
     line-height: 1.5;
-    transition: border-color var(--duration-fast);
+    transition: border-color var(--duration-fast) var(--ease-out);
 }
 
 .channelInputBox::-webkit-scrollbar {
@@ -584,14 +621,28 @@
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all var(--duration-slow) var(--ease-out);
     flex-shrink: 0;
-    transition: opacity var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring),
+                box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.channelSendBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.channelSendBtn:active:not(:disabled) {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
+    box-shadow: none;
 }
 
 .channelSendBtn:disabled {
     opacity: 0.4;
-    cursor: default;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* ── 频道为空时的提示 ── */
@@ -610,8 +661,9 @@
 .createOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(4px);
+    background: var(--overlay-heavy);
+    backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
     display: none;
     align-items: center;
     justify-content: center;
@@ -629,7 +681,10 @@
     padding: var(--space-lg);
     width: 440px;
     max-width: 90vw;
-    box-shadow: 0 12px 48px var(--shadow);
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.04),
+      0 12px 24px rgba(0,0,0,0.08),
+      0 24px 48px rgba(0,0,0,0.14);
     animation: hana-fade-up var(--duration-fast) var(--ease-out);
 }
 
@@ -663,12 +718,14 @@
     padding: 0.45rem 0.65rem;
     outline: none;
     box-shadow: 0 1px 3px var(--shadow);
-    transition: box-shadow var(--duration-slow) var(--ease-out);
+    transition: box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring);
     width: 100%;
 }
 
 .createInput:focus {
     box-shadow: 0 1px 3px var(--shadow), 0 0 0 2px rgba(var(--accent-rgb), 0.12);
+    transform: scale(1.01);
 }
 
 .createInput::placeholder {
@@ -690,7 +747,7 @@
     font-family: inherit;
     font-size: 0.82rem;
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .createCancel {
@@ -700,6 +757,12 @@
 
 .createCancel:hover {
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.createCancel:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 .createConfirm {
@@ -709,6 +772,12 @@
 
 .createConfirm:hover {
     background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.createConfirm:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 /* ── 成员选择器 ── */
@@ -730,12 +799,22 @@
     font-family: var(--font-ui);
     font-size: 0.78rem;
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: border-color var(--duration-fast) var(--ease-spring),
+                color var(--duration-fast) var(--ease-spring),
+                background-color var(--duration-fast) var(--ease-spring),
+                transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelCreateMemberChip:hover {
     border-color: var(--accent);
     color: var(--text);
+    background-color: var(--overlay-subtle);
+    transform: translateY(-1px);
+}
+
+.channelCreateMemberChip:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 .channelCreateMemberChipSelected {
@@ -826,17 +905,25 @@
     justify-content: center;
     cursor: pointer;
     opacity: 0.62;
+    transition: opacity var(--duration-instant), background var(--duration-instant), color var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelMemberRemoveButton:hover:not(:disabled) {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--overlay-subtle);
     color: var(--danger, #b45757);
     opacity: 1;
+    transform: scale(1.05);
+}
+
+.channelMemberRemoveButton:active:not(:disabled) {
+    transform: scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 .channelMemberRemoveButton:disabled {
-    cursor: default;
+    cursor: not-allowed;
     opacity: 0.25;
+    transform: none;
 }
 
 .channelMemberAddButton {
@@ -844,9 +931,9 @@
     min-height: 26px;
     margin-top: 4px;
     padding: 0 7px;
-    border: 1px dashed rgba(0, 0, 0, 0.09);
+    border: 1px dashed var(--overlay-light);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.26);
+    background: var(--overlay-medium);
     color: var(--text-muted);
     font-size: 0.74rem;
     display: flex;
@@ -854,16 +941,24 @@
     justify-content: center;
     gap: 5px;
     cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .channelMemberAddButton:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.46);
+    background: var(--overlay-strong);
     color: var(--text);
+    transform: translateY(-1px);
+}
+
+.channelMemberAddButton:active:not(:disabled) {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 .channelMemberAddButton:disabled {
-    cursor: default;
+    cursor: not-allowed;
     opacity: 0.55;
+    transform: none;
 }
 
 /* ========================================
@@ -895,9 +990,9 @@
     display: inline-flex;
     align-items: center;
     padding: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.07);
+    border: 1px solid var(--overlay-light);
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.025);
+    background: var(--overlay-subtle);
 }
 
 .agentToolModeToggleFill {
@@ -918,21 +1013,32 @@
     color: var(--text-muted);
     font-size: 0.68rem;
     cursor: pointer;
+    transition: background var(--duration-instant), color var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
+}
+
+.agentToolModeButton:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.agentToolModeButton:active:not(:disabled) {
+    transform: translateY(0) scale(0.94);
+    transition-duration: var(--duration-instant);
 }
 
 .agentToolModeButton:disabled {
-    cursor: default;
+    cursor: not-allowed;
     opacity: 0.58;
+    transform: none;
 }
 
 .agentToolModeButtonActive {
     background: var(--bg-card);
     color: var(--text);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 .agentActivityItem {
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--overlay-light);
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.34);
     overflow: hidden;
@@ -951,10 +1057,17 @@
     color: inherit;
     text-align: left;
     cursor: pointer;
+    transition: background var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .agentActivityRow:hover {
-    background: rgba(0, 0, 0, 0.025);
+    background: var(--overlay-subtle);
+    transform: translateY(-1px);
+}
+
+.agentActivityRow:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: var(--duration-instant);
 }
 
 .agentActivityAvatar {
@@ -996,12 +1109,13 @@
 }
 
 .agentActivityDetails {
-    border-top: 1px solid rgba(0, 0, 0, 0.045);
+    border-top: 1px solid var(--overlay-light);
 }
 
 .agentActivityTranscriptScroll {
     max-height: 11.5rem;
     overflow-y: auto;
+    scroll-behavior: smooth;
     overscroll-behavior: contain;
     padding: 6px 7px 7px;
     font-size: 0.74rem;
@@ -1071,13 +1185,15 @@
 .agentReplyRangeInput {
     width: 100%;
     height: 26px;
-    border: 1px solid rgba(0, 0, 0, 0.07);
+    border: 1px solid var(--overlay-light);
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.34);
     color: var(--text);
     font-size: 0.72rem;
     padding: 0 7px;
     outline: none;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .agentReplyRangeSep {
@@ -1087,8 +1203,9 @@
 }
 
 .agentReplyRangeInput:focus {
-    border-color: rgba(47, 111, 143, 0.28);
+    border-color: rgba(var(--accent-rgb), 0.28);
     background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.08);
 }
 
 .agentModelOverrideRow {
@@ -1117,11 +1234,25 @@
     font-size: 0.7rem;
     padding: 0 7px;
     cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring);
+}
+
+.agentModelSelectButton:hover:not(:disabled) {
+    border-color: rgba(var(--accent-rgb), 0.2);
+    transform: translateY(-1px);
+}
+
+.agentModelSelectButton:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    transition-duration: var(--duration-instant);
 }
 
 .agentModelSelectButton:disabled {
     opacity: 0.55;
-    cursor: default;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .agentModelSelectButton span:first-child {
@@ -1144,11 +1275,15 @@
     width: min(240px, 72vw);
     max-height: 220px;
     overflow-y: auto;
+    scroll-behavior: smooth;
     padding: 4px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 7px;
     background: var(--bg-card);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 16px rgba(0,0,0,0.08),
+      0 16px 32px rgba(0,0,0,0.12);
 }
 
 .agentModelGroupHeader {
@@ -1169,13 +1304,43 @@
     text-align: left;
     padding: 5px 7px;
     cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .agentModelOption:hover {
-    background: rgba(0, 0, 0, 0.045);
+    background: var(--overlay-light);
+    transform: translateX(2px);
+}
+
+.agentModelOption:active {
+    transform: translateX(0) scale(0.98);
+    transition: transform var(--duration-instant);
 }
 
 .agentModelOptionActive {
     background: rgba(47, 111, 143, 0.1);
     color: var(--accent);
+}
+
+@supports (animation-timeline: view()) {
+    .channelItem {
+        animation: hana-channel-reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 12%;
+    }
+}
+
+@keyframes hana-channel-reveal {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .channelItem,
+    .tbTabsSlider {
+        transition: none;
+    }
+    .channelItem {
+        animation: none;
+    }
 }

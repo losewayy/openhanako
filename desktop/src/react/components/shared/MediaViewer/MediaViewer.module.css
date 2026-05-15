@@ -2,7 +2,8 @@
   position: fixed;
   inset: 0;
   background: rgba(14, 16, 20, 0.64);
-  backdrop-filter: blur(5px) saturate(0.82);
+  backdrop-filter: blur(5px) saturate(150%);
+  -webkit-backdrop-filter: blur(5px) saturate(150%);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -27,7 +28,7 @@
   border: 2px solid rgba(80, 72, 62, 0.18);
   border-top-color: rgba(var(--accent-rgb), 0.78);
   border-radius: 50%;
-  animation: hana-spin 0.8s linear infinite;
+  animation: hana-spinner-pulse 1.2s var(--ease-liquid, cubic-bezier(0.2, 0.8, 0.2, 1)) infinite;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -58,7 +59,7 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.28), transparent);
   color: rgba(255, 255, 255, 0.92);
   font-size: 13px;
-  transition: opacity var(--duration-fast) ease-out;
+  transition: opacity var(--duration-fast) var(--ease-out);
   z-index: 2;
 }
 .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -80,9 +81,13 @@
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.34);
   color: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(10px);
-  transition: opacity var(--duration-fast) ease-out;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 8px 16px rgba(0,0,0,0.08),
+    0 16px 32px rgba(0,0,0,0.12);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  transition: opacity var(--duration-fast) var(--ease-out);
   z-index: 2;
 }
 
@@ -103,8 +108,11 @@
   font-size: 28px;
   cursor: pointer;
   border-radius: 2px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transition: opacity var(--duration-fast) ease-out, background var(--duration-instant) ease-out;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 8px 16px rgba(0,0,0,0.08),
+    0 16px 32px rgba(0,0,0,0.12);
+  transition: opacity var(--duration-fast) var(--ease-out), background-color var(--duration-instant) var(--ease-out);
   z-index: 2;
 }
 .navBtn:hover { background: rgba(20, 22, 26, 0.62); }

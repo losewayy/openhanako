@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { useI18n } from '../../hooks/use-i18n';
+import { EmptyState } from '../EmptyState';
 import { hanaFetch } from '../../hooks/use-hana-fetch';
 import {
   loadChannels,
@@ -179,7 +180,7 @@ export function ChannelList() {
   const agentMap = useMemo(() => buildAgentMap(agents), [agents]);
 
   if (channels.length === 0) {
-    return <div className="session-empty">{t('channel.empty')}</div>;
+    return <EmptyState title={t('channel.empty')} className="session-empty" />;
   }
 
   const dms = channels.filter((ch) => ch.isDM === true);

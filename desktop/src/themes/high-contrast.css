@@ -13,6 +13,9 @@
     --accent:       #3A6B85;
     --accent-hover: #2E5870;
     --accent-light: rgba(58, 107, 133, 0.08);
+    --link:         var(--accent);
+    --link-hover:   var(--accent-hover, var(--accent));
+    --link-rgb:     var(--accent-rgb);
 
     /* 文字 */
     --text:         #1A1C1E;
@@ -51,6 +54,8 @@
     --coral-rgb:    212, 113, 111;
     --danger:       #7A3030;
     --danger-rgb:   122, 48, 48;
+    --danger-bg:    #C0616B;
+    --danger-bg-hover: #A8505A;
     --overlay-subtle: rgba(0, 0, 0, 0.04);
     --overlay-light:  rgba(0, 0, 0, 0.06);
     --overlay-medium: rgba(0, 0, 0, 0.10);

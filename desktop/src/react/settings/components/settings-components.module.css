@@ -241,7 +241,7 @@
 
 .expandableChevron {
     display: inline-block;
-    transition: transform var(--duration-fast) ease;
+    transition: transform var(--duration-fast) var(--ease-out);
     font-size: 1rem;
     color: var(--text-muted);
 }

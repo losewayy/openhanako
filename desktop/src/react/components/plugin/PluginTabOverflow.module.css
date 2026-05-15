@@ -16,7 +16,7 @@
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast);
+    transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
     flex-shrink: 0;
 }
 

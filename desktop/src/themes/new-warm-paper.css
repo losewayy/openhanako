@@ -27,6 +27,9 @@
     --accent-hover: #3F6179;                    /* pressed */
     --accent-light: rgba(83, 125, 150, 0.08);
     --accent-rgb:   83, 125, 150;
+    --link:         var(--accent);
+    --link-hover:   var(--accent-hover, var(--accent));
+    --link-rgb:     var(--accent-rgb);
 
     /* ─── 语义色（墨染，极克制）─── */
     --green:        #4A6B4A;                    /* success · 墨绿 */
@@ -35,6 +38,8 @@
     --coral-rgb:    139, 44, 31;
     --danger:       #8B2C1F;
     --danger-rgb:   139, 44, 31;
+    --danger-bg:    #C0616B;
+    --danger-bg-hover: #A8505A;
 
     /* plan-mode 操作电脑那抹色：沿用 seal（规范里没给 mood，复用 accent 最不违和） */
     --mood-text:    #3F6179;
@@ -59,11 +64,11 @@
 
     /* ─── 主题级 override：圆角与边框（规范强约束："controls are seals, 方") ───
      * 同时覆盖 :root 定义的全局 radius token，让整个应用（不止设置页）统一为方 */
-    --radius-sm:     2px;                       /* 规范 --r-sm：input/button/chip */
-    --radius-md:     3px;                       /* 规范 --r-md：card / list block / dropzone */
-    --radius-lg:     4px;                       /* 规范 --r-lg：modal */
-    --radius-input:  2px;                       /* 设置页专用变量 */
-    --radius-card:   3px;
+    --radius-sm:     6px;                       /* 规范 --r-sm：input/button/chip */
+    --radius-md:     8px;                       /* 规范 --r-md：card / list block / dropzone */
+    --radius-lg:     10px;                       /* 规范 --r-lg：modal */
+    --radius-input:  6px;                       /* 设置页专用变量 */
+    --radius-card:   8px;
     --border-width:  0.5px;                     /* 规范：0.5px hairline */
 
     /* Select 下拉箭头（跟随 text-muted） */

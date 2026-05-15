@@ -55,40 +55,54 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
     fallbackAgentName: block.agentName || block.executorAgentNameSnapshot || block.agentId || 'Subagent',
   });
   const agentName = displayInfo.displayName;
-  const isOpen = previewEntry?.open ?? false;
-  const previewSessionPath = previewEntry?.sessionPath ?? (block.streamKey || null);
-  const [shouldRenderPreview, setShouldRenderPreview] = useState(isOpen);
+
+  // 已完成/失败的任务默认展开执行过程
+  const isTerminal = block.streamStatus === 'done' || block.streamStatus === 'failed' || block.streamStatus === 'aborted';
+  const [isOpen, setIsOpen] = useState(isTerminal);
+  const [shouldRenderPreview, setShouldRenderPreview] = useState(isTerminal);
   const [isClosingPreview, setIsClosingPreview] = useState(false);
   const previewScrollRef = useRef<HTMLDivElement | null>(null);
 
   // Sync block prop changes (from block_update patch)
   useEffect(() => {
     setStatus(block.streamStatus);
-    if (block.streamStatus === 'done') setDisplay(block.summary || '已完成');
-    if (block.streamStatus === 'failed') setDisplay(block.summary || '失败');
+    if (block.streamStatus === 'done') {
+      setDisplay(block.summary || '已完成');
+      setIsOpen(true);
+      setShouldRenderPreview(true);
+    }
+    if (block.streamStatus === 'failed') {
+      setDisplay(block.summary || '失败');
+      setIsOpen(true);
+      setShouldRenderPreview(true);
+    }
     if (block.streamStatus === 'aborted') setDisplay(block.summary || '已终止');
   }, [block.streamStatus, block.summary]);
 
   useEffect(() => {
+    // 终态也需要更新 store sessionPath，使 SubagentSessionPreview 能正确加载 session JSONL
+    if (!isTerminal) return; // 非终态由下面的 store.open/close 控制
     useStore.getState().setSubagentPreviewSessionPath(block.taskId, block.streamKey || null);
   }, [block.taskId, block.streamKey]);
 
+  // 非终态时使用 store 中的开关状态（running 时可手动展开/收起）
+  const storePreviewEntry = useStore(s => s.subagentPreviewByTaskId[block.taskId]);
+  const previewSessionPath = storePreviewEntry?.sessionPath ?? (block.streamKey || null);
   useEffect(() => {
-    if (isOpen) {
+    if (isTerminal) return; // 终态已由上面的 effect 控制
+    if (storePreviewEntry?.open) {
       setShouldRenderPreview(true);
       setIsClosingPreview(false);
       return;
     }
     if (!shouldRenderPreview) return;
-
     setIsClosingPreview(true);
     const timer = window.setTimeout(() => {
       setShouldRenderPreview(false);
       setIsClosingPreview(false);
     }, SUBAGENT_PREVIEW_CLOSE_MS);
-
     return () => window.clearTimeout(timer);
-  }, [isOpen, shouldRenderPreview]);
+  }, [storePreviewEntry?.open, isTerminal]);
 
   // Subscribe to live events
   useEffect(() => {
@@ -114,16 +128,21 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
     return unsub;
   }, [block.streamKey, status]);
 
-  // "已中断" 仅在历史加载时判断：组件首次 mount 时如果 streamKey 为空且 status=running，
-  // 等待一小段时间让 block_update 到达。如果一直没到才标记中断。
+  // "已中断" 判断：组件首次 mount 时如果 streamKey 为空且 status=running，
+  // 等待一段时间让 block_update 到达。如果一直没到才标记中断。
+  // hasEverHadStreamKey 防止 streamKey 短暂到达后又丢失时的误判。
   const [waitedForKey, setWaitedForKey] = useState(false);
+  const hasEverHadStreamKey = useRef(!!block.streamKey);
+  useEffect(() => {
+    if (block.streamKey) hasEverHadStreamKey.current = true;
+  }, [block.streamKey]);
   useEffect(() => {
     if (block.streamKey || status !== 'running') return;
-    const timer = setTimeout(() => setWaitedForKey(true), 3000);
+    const timer = setTimeout(() => setWaitedForKey(true), 8000);
     return () => clearTimeout(timer);
   }, [block.streamKey, status]);
 
-  const isInterrupted = status === 'running' && !block.streamKey && waitedForKey;
+  const isInterrupted = status === 'running' && !block.streamKey && waitedForKey && !hasEverHadStreamKey.current;
 
   const handleAbort = useCallback(async () => {
     try {
@@ -136,12 +155,19 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
   }, [block.taskId]);
 
   const handleToggle = useCallback(() => {
+    if (isTerminal) {
+      // 终态用本地状态控制展开/收起
+      setIsOpen(v => !v);
+      setShouldRenderPreview(v => !v);
+      return;
+    }
+    // running 状态用 store 控制
     if (isOpen) {
       useStore.getState().closeSubagentPreview(block.taskId);
       return;
     }
     useStore.getState().openSubagentPreview(block.taskId, block.streamKey || null);
-  }, [block.taskId, block.streamKey, isOpen]);
+  }, [block.taskId, block.streamKey, isOpen, isTerminal]);
 
   const headerDisplay = block.taskTitle;
 

@@ -1,4 +1,4 @@
-import type { Extensions } from '@tiptap/core';
+import { type Extensions, Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold } from '@tiptap/extension-bold';
 import Placeholder, { type PlaceholderOptions } from '@tiptap/extension-placeholder';
@@ -28,5 +28,14 @@ export function createInputEditorExtensions(placeholder: InputEditorPlaceholder)
     Placeholder.configure({ placeholder }),
     SkillBadge,
     FileBadge,
+    /* Enter 仅发送不换行；Shift+Enter 由 StarterKit 的 hardBreak 快捷键处理 */
+    Extension.create({
+      name: 'enterKeyHandler',
+      addKeyboardShortcuts() {
+        return {
+          Enter: () => true,
+        };
+      },
+    }),
   ];
 }

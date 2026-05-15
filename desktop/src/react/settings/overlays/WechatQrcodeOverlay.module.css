@@ -4,7 +4,7 @@
   inset: 0;
   z-index: 100;
   background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--glass-blur-sm));
   -webkit-app-region: no-drag;
 }
 
@@ -34,7 +34,7 @@
   padding: 4px;
   color: var(--text-secondary);
   opacity: 0.6;
-  transition: opacity var(--duration-fast) ease;
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .closeBtn:hover {
@@ -79,4 +79,7 @@
 .loading {
   color: var(--text-tertiary);
   font-size: 13px;
+  animation: hana-pulse 2s ease-in-out infinite;
+  --pulse-lo: 0.4;
+  --pulse-hi: 1;
 }

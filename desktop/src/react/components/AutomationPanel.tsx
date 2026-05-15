@@ -5,6 +5,7 @@ import { usePanel } from '../hooks/use-panel';
 import { hanaFetch } from '../hooks/use-hana-fetch';
 import { cronToHuman } from '../utils/format';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
+import { EmptyState } from './EmptyState';
 import fp from './FloatingPanels.module.css';
 
 interface CronJob {
@@ -119,7 +120,7 @@ export function AutomationPanel() {
         <div className={fp.floatingPanelBody}>
           <div className={fp.automationList} id="automationList">
             {jobs.length === 0 ? (
-              <div className={fp.automationEmpty}>{(window.t ?? ((p: string) => p))('automation.empty')}</div>
+              <EmptyState title={(window.t ?? ((p: string) => p))('automation.empty')} className={fp.automationEmpty} />
             ) : (
               jobs.map(job => (
                 <AutomationItem

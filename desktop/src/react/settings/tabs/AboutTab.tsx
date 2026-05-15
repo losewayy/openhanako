@@ -107,6 +107,10 @@ export function AboutTab() {
           control={<span>© 2026 liliMozi</span>}
         />
         <SettingsRow
+          label="Font"
+          control={<span>MiSans by Xiaomi</span>}
+        />
+        <SettingsRow
           label="GitHub"
           control={
             <a

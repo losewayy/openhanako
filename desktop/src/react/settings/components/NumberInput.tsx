@@ -44,7 +44,7 @@ export function NumberInput({
         value={value}
         min={min}
         max={max}
-        step={step}
+        step={step ?? 100}
         disabled={disabled}
         onChange={handleChange}
       />

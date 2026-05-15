@@ -88,13 +88,15 @@ export function SubagentSessionPreview({ taskId, sessionPath, agentId, streamSta
   // 不能用 hasAssistantHistory(items) 做被动推断：多轮 turn 场景下 items 永远有上一轮的
   // assistant 记录，被动清理会把刚开始的新一轮 streamMessage 立刻抹掉。
 
+  // 预览 fetch：sessionPath 一旦有效就立即加载（不区分终态/非终态）
+  // 非终态在 streaming 阶段会额外订阅实时事件（见下方 subscribe effect）
   useEffect(() => {
-    if (!sessionPath) return;
-    if (items.length > 0) {
+    if (sessionPath && items.length > 0) {
+      // items 已有内容（之前已 fetch 过），直接标记 loaded，不重复请求
       useStore.getState().markSubagentPreviewLoaded(taskId);
       return;
     }
-    if (entry?.loading) return;
+    if (!sessionPath || entry?.loading) return; // sessionPath 未到位或已在加载中，跳过
 
     let cancelled = false;
     let retryTimer: number | null = null;
@@ -115,6 +117,7 @@ export function SubagentSessionPreview({ taskId, sessionPath, agentId, streamSta
         }
 
         latestState.setSubagentPreviewLoading(taskId, false);
+        // 非终态任务：轮询等待 session 产生内容
         if (streamStatus === 'running') {
           retryTimer = window.setTimeout(() => {
             if (!cancelled) setRetryNonce((n) => n + 1);
