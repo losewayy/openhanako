@@ -104,12 +104,12 @@
     "@vercel/nft": "^1.5.0",
     "@vitejs/plugin-react": "^5.1.4",
     "electron": "^38.8.4",
-    "electron-builder": "^26.8.1",
+    "electron-builder": "^25.1.8",
     "esbuild": "^0.27.4",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "patch-package": "^8.0.1",
-    "pngjs": "^5.0.0",
+    "pngjs": "5.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2",
     "vite": "^7.3.1",
@@ -204,7 +204,7 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": false,
+      "allowToChangeInstallationDirectory": true,
       "include": "build/installer.nsh",
       "installerIcon": "desktop/src/icon.ico",
       "uninstallerIcon": "desktop/src/icon.ico"

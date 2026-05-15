@@ -133,6 +133,11 @@ function emitAgentConfigAppEvents(engine, agentId, { globalFields, agentPartial,
     });
   }
 
+  const chat = getGlobalValue(globalFields, "chat");
+  if (chat !== undefined) {
+    emitAppEvent(engine, "chat-typography-changed", { chat });
+  }
+
   if (hasOwn(agentPartial, "skills")) {
     emitAppEvent(engine, "skills-changed", { agentId });
   }

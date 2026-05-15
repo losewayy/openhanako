@@ -128,22 +128,46 @@ function normalizePromptSnapshot(value) {
 function makeBackgroundTaskPrompt(locale) {
   const isZh = String(locale || "").startsWith("zh");
   return isZh
-    ? `## 后台任务
+    ? `## subagent 工具使用指南
 
-派出 subagent 或其他后台任务后：
+subagent 工具支持两种模式：
 
-1. 先继续做手头还没做完的工作，不要立刻停下来等
-2. 手头工作做完后，调 check_pending_tasks 查看后台任务状态
-3. 如果还有任务未完成，根据任务复杂度自行估算等待时间，调 wait 等待后再查。最多查 2 次，之后不再轮询，告知用户任务仍在后台运行，完成后会自动通知
-4. 后台任务完成时系统也会以 <hana-background-result> 消息自动送达结果，届时处理并告知用户`
-    : `## Background Tasks
+**sync 模式（默认）**：派出后等待子任务完成，适合需要等结果再继续的场景。
+  用法：subagent(task="...", mode="sync")
+  - 可一次派出多个并行 subagent（在单次回复中发起多次 subagent 调用即可）
+  - 所有 subagent 并行执行，全部完成后结果统一回到上下文
+  - 适合调研、搜索、分析等需要拿到结果才能继续的任务
 
-After dispatching subagent or other background tasks:
+**async 模式**：派出后立即返回，适合"先派出去查，我们继续聊"的场景。
+  用法：subagent(task="...", mode="async")
+  - 派出后继续当前对话
+  - 子任务完成后系统会自动以 <hana-background-result> 消息推送结果
+  - 适合耗时较长、不需要立即拿到结果的任务
 
-1. Continue with any remaining work first — do not stop immediately to wait
-2. Once your other work is done, call check_pending_tasks to check status
-3. If tasks are still pending, estimate a reasonable wait time based on task complexity, then call wait and check again. Check at most 2 times — after that, stop polling and inform the user the task is still running and they will be notified when it completes
-4. The system will also automatically deliver results via <hana-background-result> messages when tasks finish — process and relay them to the user`;
+选择建议：
+- 如果需要多个独立调研任务，用 sync 模式一次派出多个，效率最高
+- 如果用户明确表示"你先去查，我们继续聊"，用 async 模式
+- 不确定时优先用 sync 模式，用户体验更好（一次性拿到完整结果）`
+    : `## Subagent Tool Usage Guide
+
+The subagent tool supports two modes:
+
+**sync mode (default)**: Waits for the sub-task to complete. Use when you need results before continuing.
+  Usage: subagent(task="...", mode="sync")
+  - Launch multiple parallel subagents by making multiple subagent calls in one response
+  - All subagents run in parallel, results come back together in context
+  - Best for research, search, analysis tasks
+
+**async mode**: Returns immediately. Use for "fire and forget" scenarios.
+  Usage: subagent(task="...", mode="async")
+  - Continue the conversation while subagent works
+  - Results are pushed via <hana-background-result> when complete
+  - Best for long-running tasks where you want to keep chatting
+
+Guidelines:
+- For independent research tasks, use sync mode with multiple parallel calls
+- If the user says "go look it up while we talk", use async mode
+- When unsure, prefer sync mode for better user experience`;
 }
 
 function buildAppendSystemPromptSnapshot({

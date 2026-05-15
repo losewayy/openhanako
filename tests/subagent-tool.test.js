@@ -67,7 +67,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
   it("dispatches task and returns immediately with running status", async () => {
     const tool = createSubagentTool(deps);
     const task = "任务：查一下项目状态\n\n请阅读当前仓库的未提交改动，并总结风险。";
-    const result = await tool.execute("call_1", { task }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task, mode: "async" }, null, null, mockCtx());
 
     // t() returns the key path when locale is not loaded in tests
     expect(result.content[0].text).toMatch(/task-id|subagentDispatched/);
@@ -102,7 +102,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       persistSubagentSessionMeta,
     }));
 
-    const result = await tool.execute("call_1", { task: "当前 agent 自己执行" }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task: "当前 agent 自己执行", mode: "async" }, null, null, mockCtx());
     const { taskId } = result.details;
 
     await vi.waitFor(() => {
@@ -144,7 +144,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     }));
 
     const task = "你是一个生活规划助手。请为用户制定一份**一周生活规律建议**，涵盖以下五个方面：\n\n1. 作息\n2. 运动";
-    const result = await tool.execute("call_1", { task }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task, mode: "async" }, null, null, mockCtx());
 
     expect(result.details.taskTitle).toBe("你是一个生活规划助手。请为用户制定一份**一周生活规律建议**，涵盖以下五个方面：");
     expect(executeIsolated).toHaveBeenCalledWith(
@@ -156,7 +156,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
   // 2. deferred store resolves on success
   it("resolves deferred store on success", async () => {
     const tool = createSubagentTool(deps);
-    await tool.execute("call_1", { task: "成功的任务" }, null, null, mockCtx());
+    await tool.execute("call_1", { task: "成功的任务", mode: "async" }, null, null, mockCtx());
 
     await vi.waitFor(() => {
       expect(mockStore.resolve).toHaveBeenCalledWith(
@@ -178,7 +178,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       getDeferredStore: () => mockStore,
     }));
 
-    await tool.execute("call_1", { task: "会失败的任务" }, null, null, mockCtx());
+    await tool.execute("call_1", { task: "会失败的任务", mode: "async" }, null, null, mockCtx());
 
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
@@ -202,7 +202,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       ]),
     }));
 
-    const result = await tool.execute("call_1", { task: "委派任务", agent: "butter" }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task: "委派任务", agent: "butter", mode: "async" }, null, null, mockCtx());
 
     expect(result.details.requestedAgentId).toBe("butter");
     expect(result.details.executorAgentId).toBe("butter");
@@ -234,7 +234,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       emitEvent,
     }));
 
-    const result = await tool.execute("call_1", { task: "完成的任务" }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task: "完成的任务", mode: "async" }, null, null, mockCtx());
     const { taskId } = result.details;
 
     await vi.waitFor(() => {
@@ -262,7 +262,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       emitEvent,
     }));
 
-    const result = await tool.execute("call_1", { task: "失败的任务" }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task: "失败的任务", mode: "async" }, null, null, mockCtx());
     const { taskId } = result.details;
 
     await vi.waitFor(() => {
@@ -296,7 +296,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       emitEvent,
     }));
 
-    const result = await tool.execute("call_1", { task: "长任务" }, null, null, mockCtx());
+    const result = await tool.execute("call_1", { task: "长任务", mode: "async" }, null, null, mockCtx());
     expect(result.details.streamStatus).toBe("running");
 
     await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
@@ -316,6 +316,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
       }),
       "/test/session.jsonl",
     );
+    vi.useRealTimers();
   });
 
   // 6. per-session concurrent limit: rejects 9th task on the same session
@@ -333,7 +334,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     // Dispatch 8 tasks on the same session (fire-and-forget)
     const results = [];
     for (let i = 0; i < 8; i++) {
-      results.push(await tool.execute(`call_${i}`, { task: `任务 ${i}` }, null, null, mockCtx()));
+      results.push(await tool.execute(`call_${i}`, { task: `任务 ${i}`, mode: "async" }, null, null, mockCtx()));
     }
     for (const r of results) {
       expect(r.details.streamStatus).toBe("running");
@@ -364,13 +365,13 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     // Session A: dispatch 8 tasks
     for (let i = 0; i < 8; i++) {
-      const r = await tool.execute(`call_a${i}`, { task: `任务 A${i}` }, null, null, mockCtx("/session/a.jsonl"));
+      const r = await tool.execute(`call_a${i}`, { task: `任务 A${i}`, mode: "async" }, null, null, mockCtx("/session/a.jsonl"));
       expect(r.details.streamStatus).toBe("running");
     }
 
     // Session B: should still be able to dispatch 8 tasks (independent quota)
     for (let i = 0; i < 8; i++) {
-      const r = await tool.execute(`call_b${i}`, { task: `任务 B${i}` }, null, null, mockCtx("/session/b.jsonl"));
+      const r = await tool.execute(`call_b${i}`, { task: `任务 B${i}`, mode: "async" }, null, null, mockCtx("/session/b.jsonl"));
       expect(r.details.streamStatus).toBe("running");
     }
 
@@ -405,14 +406,14 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     // Fill up 20 tasks across 4 sessions (5 each, under per-session limit of 8)
     for (let s = 0; s < 4; s++) {
       for (let i = 0; i < 5; i++) {
-        const r = await tool.execute(`call_${s}_${i}`, { task: `任务` }, null, null, mockCtx(`/session/${s}.jsonl`));
+        const r = await tool.execute(`call_${s}_${i}`, { task: `任务`, mode: "async" }, null, null, mockCtx(`/session/${s}.jsonl`));
         expect(r.details.streamStatus).toBe("running");
       }
     }
 
     // 21st task from a new session (per-session is fine, but global is full)
     const blocked = await tool.execute("call_4_0", { task: "第21个" }, null, null, mockCtx("/session/4.jsonl"));
-    expect(blocked.content[0].text).toMatch(/20|subagentMaxConcurrent/);
+    expect(blocked.content[0].text).toMatch(/20|subagentMaxGlobal/);
     expect(blocked.details).toBeUndefined();
 
     // Cleanup
@@ -521,8 +522,99 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     const result = await tool.execute("call_1", { task: "同步任务" });
 
-    // sync fallback returns the reply text directly (no details / streamStatus)
+    // sync fallback returns the reply text directly with details
     expect(result.content[0].text).toBe("sync result");
-    expect(result.details).toBeUndefined();
+    expect(result.details).toBeDefined();
+    expect(result.details.streamStatus).toBe("done");
+  });
+
+  // 11. sync mode also respects per-session concurrency limit
+  it("sync mode respects per-session concurrency limit", async () => {
+    const pending = [];
+    const blockingExecute = vi.fn().mockImplementation((_prompt, opts) => {
+      return new Promise((resolve) => pending.push(resolve));
+    });
+    const tool = createSubagentTool(makeDeps({
+      executeIsolated: blockingExecute,
+      getDeferredStore: () => null,
+      getSessionPath: () => "/test/session.jsonl",
+    }));
+
+    // Fire 8 sync tasks (they incActive via sync path, not _syncFallback which requires deferred store)
+    const results = [];
+    for (let i = 0; i < 8; i++) {
+      const promise = tool.execute(`call_${i}`, { task: `SyncTask ${i}`, mode: "sync" }, null, null, mockCtx());
+      expect(promise).toBeInstanceOf(Promise);
+      results.push(promise);
+    }
+
+    // 9th sync task on the same session must be rejected
+    const blocked = await tool.execute("call_8", { task: "第9个同步任务", mode: "sync" }, null, null, mockCtx());
+    expect(blocked.content[0].text).toMatch(/8|subagentMaxConcurrent/);
+    expect(blocked.details).toBeUndefined();
+
+    // Cleanup
+    for (const resolve of pending) {
+      resolve({ replyText: "ok", error: null, sessionPath: null });
+    }
+  });
+
+  // 12. taskId sequence increments monotonically
+  it("generates monotonically increasing taskId counters", async () => {
+    const captureExecute = vi.fn().mockImplementation((_prompt, opts) => {
+      return Promise.resolve({ replyText: "ok", error: null, sessionPath: null });
+    });
+    const tool = createSubagentTool(makeDeps({
+      executeIsolated: captureExecute,
+      getSessionPath: () => null,
+    }));
+
+    const r1 = await tool.execute("call_1", { task: "a" });
+    const r2 = await tool.execute("call_2", { task: "b" });
+    const r3 = await tool.execute("call_3", { task: "c" });
+
+    // Extract counter values from taskIds
+    const extractCounter = (id) => {
+      const parts = id.split("-");
+      return parseInt(parts[2], 10);
+    };
+    const c1 = extractCounter(r1.details.taskId);
+    const c2 = extractCounter(r2.details.taskId);
+    const c3 = extractCounter(r3.details.taskId);
+    expect(c2).toBe(c1 + 1);
+    expect(c3).toBe(c2 + 1);
+  });
+
+  // 13. agent="?" discovery mode excludes self and lists others
+  it("lists agents excluding self in discovery mode", async () => {
+    const tool = createSubagentTool(makeDeps({
+      listAgents: () => [
+        { id: "self", name: "Self", model: "gpt-4" },
+        { id: "other-1", name: "Other One", model: "claude-3" },
+        { id: "other-2", name: "Other Two" },
+      ],
+      currentAgentId: "self",
+    }));
+
+    const result = await tool.execute("call_1", { task: "", agent: "?" });
+    expect(result.content[0].text).toContain("other-1");
+    expect(result.content[0].text).toContain("other-2");
+    expect(result.content[0].text).not.toContain("self");
+  });
+
+  // 14. ambiguous agent name returns error with candidates
+  it("rejects ambiguous agent name and lists candidates", async () => {
+    const tool = createSubagentTool(makeDeps({
+      listAgents: () => [
+        { id: "hana", name: "Hana" },
+        { id: "hanako", name: "Hana" }, // same display name
+      ],
+      currentAgentId: "self",
+    }));
+
+    const result = await tool.execute("call_1", { task: "task", agent: "Hana" });
+    expect(result.content[0].text).toMatch(/找不到 agent|agentNotFound/);
+    expect(result.content[0].text).toContain("hana");
+    expect(result.content[0].text).toContain("hanako");
   });
 });

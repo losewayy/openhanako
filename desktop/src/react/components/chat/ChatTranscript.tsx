@@ -2,6 +2,7 @@ import { memo, useCallback, useMemo } from 'react';
 import type { ChatListItem } from '../../stores/chat-types';
 import { UserMessage } from './UserMessage';
 import { AssistantMessage } from './AssistantMessage';
+import styles from './Chat.module.css';
 
 interface Props {
   items: ChatListItem[];
@@ -12,6 +13,8 @@ interface Props {
   userIdentity?: { name?: string | null; avatarUrl?: string | null };
   registerMessageElement?: (messageId: string, element: HTMLDivElement | null) => void;
 }
+
+
 
 export const ChatTranscript = memo(function ChatTranscript({
   items,
@@ -79,6 +82,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   if (item.type === 'compaction') return null;
 
   const msg = item.data;
+  const prevMsg = prevItem?.type === 'message' ? prevItem.data : undefined;
   const prevRole = prevItem?.type === 'message' ? prevItem.data.role : null;
   const showAvatar = msg.role !== prevRole;
 

@@ -1,38 +1,72 @@
 /* ========================================
    Session 列表 — CSS Module
+   「浮岛」设计方案
+   彻底删除 1px 细线，条目成为独立浮岛。
    ======================================== */
+
+@keyframes hana-session-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 
 .sessionList {
     flex: 1;
     overflow-y: auto;
-    padding: 0 var(--space-sm);
+    scroll-behavior: smooth;
     -webkit-app-region: no-drag;
+    /* 整体内边距：左右 12px，顶部 4px，底部 8px */
+    padding: 4px 12px 8px;
 }
 
 .sessionItem {
     display: flex;
     flex-direction: column;
-    padding: 6px var(--space-sm);
-    margin-bottom: 1px;
-    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background var(--duration-fast), color var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-instant);
     -webkit-app-region: no-drag;
     border: none;
-    background: none;
+    background: transparent;
     width: 100%;
     text-align: left;
     font-family: inherit;
     overflow: hidden;
     position: relative;
+    min-height: 48px;
+    box-shadow: none;
+    animation: hana-session-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 12%;
 }
 
 .sessionItem:hover {
-    background: var(--accent-light);
+    background: var(--session-item-hover, rgba(255, 255, 255, 0.06));
 }
 
+.sessionItem:last-child {
+    margin-bottom: 0;
+}
+
+.sessionItem:active:not(.sessionItemActive) {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+}
+
+/* 选中态：背景 + 左侧 3px accent 竖线 */
 .sessionItemActive {
-    background: var(--accent-light);
+    background: var(--session-item-active, rgba(255, 255, 255, 0.10));
+    /* 内嵌一条 3px 宽的强调色竖线，不发光不投影 */
+    box-shadow: inset 3px 0 0 var(--accent, #E6B1C4);
+}
+
+/* 移除旧版 active 文字样式，靠 accent 竖线已足够 */
+.sessionItemActive .sessionItemTitle {
+    font-weight: 600;
+    color: var(--text);
 }
 
 .sessionItemTitle {
@@ -45,20 +79,15 @@
     min-width: 0;
 }
 
-.sessionItemActive .sessionItemTitle {
-    color: var(--accent);
-    font-weight: 600;
-}
-
 .sessionItemMeta {
     font-size: 0.66rem;
     color: var(--text-muted);
-    margin-top: 1px;
+    margin-top: 2px;
     opacity: 0.8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: padding-right var(--duration-fast);
+    transition: padding-right var(--duration-fast) var(--ease-out);
 }
 
 .sessionItem:hover .sessionItemMeta {
@@ -69,8 +98,8 @@
     display: inline-flex;
     align-items: center;
     align-self: flex-start;
-    margin-top: 0.35rem;
-    padding: 0.18rem 0.5rem;
+    margin-top: 4px;
+    padding: 2px 6px;
     border-radius: 999px;
     background: rgba(var(--accent-rgb), 0.12);
     color: var(--accent);
@@ -83,10 +112,54 @@
     text-overflow: ellipsis;
 }
 
+/* 顶部分组标题：11px 全大写，字间距 0.05em */
+.sessionSectionTitle {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 20px 12px 4px;
+    opacity: 0.7;
+    user-select: none;
+}
+
+/* 第一组贴近顶部不留太多空白 */
+.sessionSectionTitle:first-child {
+    padding-top: 12px;
+}
+
+/* 分组与下方第一个条目之间 16px 间距（标题 bottom padding + 16px gap） */
+.sessionSectionTitle + .sessionItem,
+section:first-child > .sessionSectionTitle + * {
+    /* 由 section 间距控制，此处无需单独处理 */
+}
+
+/* 置顶区不改动标题样式 */
+.pinnedSection {
+    margin: 0;
+    padding: 0;
+}
+
+.pinnedSection .sessionSectionTitle {
+    padding-top: 12px;
+}
+
+.pinnedSectionTitle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pinnedTitleIcon {
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
 /* 重命名按钮 */
 .sessionPinBtn {
     position: absolute;
-    bottom: 4px;
+    bottom: 6px;
     right: 52px;
     display: flex;
     align-items: center;
@@ -99,7 +172,7 @@
     color: var(--text-muted);
     cursor: pointer;
     opacity: 0;
-    transition: all var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
     z-index: 1;
 }
 
@@ -113,14 +186,15 @@
 
 .sessionPinBtn:hover {
     opacity: 1 !important;
-    background: var(--accent-light);
+    background: var(--session-item-btn-bg, rgba(255, 255, 255, 0.08));
     color: var(--accent);
 }
 
 .sessionRenameBtn {
     position: absolute;
-    bottom: 4px;
-    right: 28px;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -132,7 +206,7 @@
     color: var(--text-muted);
     cursor: pointer;
     opacity: 0;
-    transition: all var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
     z-index: 1;
 }
 
@@ -146,8 +220,19 @@
 
 .sessionRenameBtn:hover {
     opacity: 1 !important;
-    background: var(--accent-light);
+    background: var(--session-item-btn-bg, rgba(255, 255, 255, 0.08));
     color: var(--accent);
+}
+
+/* 焦点态 */
+.sessionItem:focus-visible,
+.newSessionButton:focus-visible,
+.sessionPinBtn:focus-visible,
+.sessionRenameBtn:focus-visible,
+.sessionArchiveBtn:focus-visible,
+.deleteButton:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
 }
 
 /* 重命名输入框 */
@@ -155,7 +240,7 @@
     font-size: 0.8rem;
     color: var(--accent);
     line-height: 1.4;
-    background: var(--accent-light);
+    background: var(--session-item-btn-bg, rgba(255, 255, 255, 0.08));
     border: none;
     border-radius: 2px;
     padding: 0 4px;
@@ -168,7 +253,7 @@
 /* 归档按钮 */
 .sessionArchiveBtn {
     position: absolute;
-    bottom: 4px;
+    bottom: 6px;
     right: 4px;
     display: flex;
     align-items: center;
@@ -181,7 +266,7 @@
     color: var(--danger);
     cursor: pointer;
     opacity: 0;
-    transition: all var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
     z-index: 1;
 }
 
@@ -195,7 +280,7 @@
 
 .sessionArchiveBtn:hover {
     opacity: 1 !important;
-    background: rgba(var(--danger-rgb), 0.08);
+    background: rgba(var(--danger-rgb), 0.10);
 }
 
 /* streaming 呼吸动画 */
@@ -211,7 +296,7 @@
 /* 浏览器标记 */
 .sessionBrowserBadge {
     position: absolute;
-    top: 4px;
+    top: 6px;
     right: 4px;
     display: flex;
     align-items: center;
@@ -223,7 +308,7 @@
     cursor: pointer;
     pointer-events: auto;
     border-radius: 3px;
-    transition: color var(--duration-fast), background var(--duration-fast), opacity var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast), opacity var(--duration-fast) var(--ease-out);
 }
 
 .sessionBrowserBadge svg {
@@ -234,7 +319,7 @@
 .sessionBrowserBadge:focus-visible {
     opacity: 1;
     color: var(--danger);
-    background: rgba(var(--danger-rgb), 0.08);
+    background: rgba(var(--danger-rgb), 0.10);
     outline: none;
 }
 
@@ -271,41 +356,7 @@
     padding-right: 22px;
 }
 
-/* 分组标题 */
-.sessionSectionTitle {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0;
-    padding: var(--space-sm) var(--space-sm) 2px;
-    opacity: 0.72;
-    user-select: none;
-}
-
-.sessionSectionTitle:first-child {
-    padding-top: var(--space-xs);
-}
-
-.pinnedSection {
-    margin: 0;
-    padding: 0;
-}
-
-.pinnedSection .sessionSectionTitle {
-    padding-top: var(--space-xs);
-}
-
-.pinnedSectionTitle {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-}
-
-.pinnedTitleIcon {
-    opacity: 0.8;
-    flex-shrink: 0;
-}
-
+/* Summary Card */
 .sessionSummaryCard {
     position: fixed;
     z-index: 9998;
@@ -314,8 +365,11 @@
     padding: 10px 12px;
     background: var(--bg-card, var(--bg));
     border: 1px solid var(--overlay-light);
-    border-radius: var(--radius-md);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.07);
+    border-radius: 10px;
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.04),
+      0 12px 24px rgba(0,0,0,0.08),
+      0 24px 48px rgba(0,0,0,0.14);
     font-family: inherit;
 }
 
@@ -373,7 +427,7 @@
 /* 空状态 */
 .sessionEmpty {
     text-align: center;
-    padding: var(--space-lg) var(--space-sm);
+    padding: var(--space-lg) 12px;
     color: var(--text-muted);
     font-size: 0.78rem;
 }

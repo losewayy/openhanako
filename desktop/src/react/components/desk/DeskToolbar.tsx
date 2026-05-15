@@ -16,6 +16,7 @@ import {
   type FileTypeFilter,
   type CtxMenuState,
 } from './desk-types';
+import { EmptyState } from '../EmptyState';
 import s from './Desk.module.css';
 
 // ── Open in Finder 按钮 ──
@@ -229,9 +230,9 @@ export function DeskSearchBox() {
       />
       {open && query.trim() && (
         <div className={s.searchResults} role="listbox" aria-label={t('desk.search.results')}>
-          {results.length === 0 ? (
-            <div className={s.searchEmpty}>{t('desk.search.empty')}</div>
-          ) : (
+{results.length === 0 ? (
+              <EmptyState title={t('desk.search.empty')} className={s.searchEmpty} />
+            ) : (
             results.map(result => (
               <button
                 key={result.relativePath}

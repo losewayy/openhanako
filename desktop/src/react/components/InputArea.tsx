@@ -332,6 +332,12 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
     },
   });
 
+  // 安全访问 editor.commands（防止 editor 未完全初始化）
+  const safeCommands = useCallback(() => {
+    if (!editor || editor.isDestroyed) return null;
+    return editor.commands;
+  }, [editor]);
+
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
     editor.view.dispatch(editor.state.tr.setMeta('input-placeholder-refresh', placeholder));
@@ -340,7 +346,9 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
   // Focus trigger from store
   const inputFocusTrigger = useStore(s => s.inputFocusTrigger);
   useEffect(() => {
-    if (inputFocusTrigger > 0) editor?.commands.focus();
+    if (inputFocusTrigger > 0 && editor && !editor.isDestroyed) {
+      editor.commands.focus();
+    }
   }, [inputFocusTrigger, editor]);
 
   // Doc context
@@ -385,16 +393,19 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
   // ── 斜杠命令 ──
 
   const diaryFn = useCallback(() => {
-    executeDiary(t, addToast, removeToast, () => { editor?.commands.clearContent(); }, setSlashMenuOpen)();
-  }, [t, addToast, removeToast, editor]);
+    const cmds = safeCommands();
+    if (cmds) executeDiary(t, addToast, removeToast, () => { cmds.clearContent(); }, setSlashMenuOpen)();
+  }, [t, addToast, removeToast, safeCommands]);
   const xingFn = useCallback(async () => {
-    editor?.commands.clearContent();
+    const cmds = safeCommands();
+    if (cmds) cmds.clearContent();
     setSlashMenuOpen(false);
     await sendAsUser(XING_PROMPT);
-  }, [sendAsUser, editor]);
+  }, [sendAsUser, safeCommands]);
   const compactFn = useCallback(async () => {
-    await executeCompact(setSlashBusy, () => { editor?.commands.clearContent(); }, setSlashMenuOpen)();
-  }, [editor]);
+    const cmds = safeCommands();
+    if (cmds) await executeCompact(setSlashBusy, () => { cmds.clearContent(); }, setSlashMenuOpen)();
+  }, [safeCommands]);
 
   const skillItems = useSkillSlashItems();
 
@@ -494,7 +505,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
 
   // Sync editor text to React state (drives hasInput / canSend) + slash menu detection + draft save
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     const handler = () => {
       const text = editor.getText();
       setInputText(text);
@@ -525,15 +536,22 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
         setDraft(currentSessionPath, text);
       }
       // 内容超出可见区域时，自动滚动到光标位置
-      requestAnimationFrame(() => editor.commands.scrollIntoView());
+      requestAnimationFrame(() => {
+        const cmds = safeCommands();
+        if (cmds) cmds.scrollIntoView();
+      });
     };
     editor.on('update', handler);
-    return () => { editor.off('update', handler); };
-  }, [editor, currentSessionPath, setDraft, slashCommands]);
+    return () => {
+      if (editor && !editor.isDestroyed) {
+        editor.off('update', handler);
+      }
+    };
+  }, [editor, currentSessionPath, setDraft, slashCommands, safeCommands]);
 
   // 切换 session 时恢复草稿
   useEffect(() => {
-    if (!editor || !currentSessionPath) return;
+    if (!editor || editor.isDestroyed || !currentSessionPath) return;
     const draft = useStore.getState().drafts[currentSessionPath] || '';
     const current = editor.getText();
     if (draft !== current) {
@@ -639,7 +657,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
     }
 
     const plainUrlPaste = extractPlainUrlPaste(e.clipboardData);
-    if (plainUrlPaste && editor) {
+    if (plainUrlPaste && editor && !editor.isDestroyed) {
       e.preventDefault();
       editor.commands.insertContent(plainUrlPaste);
       return true;
@@ -673,7 +691,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
       item.execute();
       return;
     }
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     editor.chain()
       .clearContent()
       .insertContent({ type: 'skillBadge', attrs: { name: item.name } })
@@ -684,7 +702,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
   }, [editor]);
 
   const handleFileMentionSelect = useCallback((item: FileMentionItem) => {
-    if (!editor || !fileMentionRange) return;
+    if (!editor || editor.isDestroyed || !fileMentionRange) return;
     editor.chain()
       .focus()
       .deleteRange({ from: fileMentionRange.from, to: fileMentionRange.to })
@@ -707,7 +725,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
 
   // ── Send message ──
   const handleSend = useCallback(async () => {
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     const editorJson = editor.getJSON();
     const { text: rawText, skills, fileRefs } = serializeEditor(editorJson);
     const text = rawText.trim();
@@ -848,7 +866,8 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
       const allFiles = [...(hasFiles ? inputFiles : [])];
       if (docForRender) allFiles.push({ path: docForRender.path, name: docForRender.name });
 
-      editor.commands.clearContent();
+      const cmds = safeCommands();
+      if (cmds) cmds.clearContent();
       if (currentSessionPath) clearDraft(currentSessionPath);
       clearAttachedFiles();
       const qs2 = useStore.getState().quotedSelection;
@@ -890,7 +909,7 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
 
   // ── Steer ──
   const handleSteer = useCallback(async () => {
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     const text = editor.getText().trim();
     if (!text || !isStreaming) return;
     const ws = getWebSocket();
@@ -903,7 +922,8 @@ function InputAreaInner({ cardRef }: InputAreaInnerProps) {
         data: { id: `user-${Date.now()}`, role: 'user', text, textHtml: renderMarkdown(text), timestamp: Date.now() },
       });
     }
-    editor.commands.clearContent();
+    const cmds = safeCommands();
+    if (cmds) cmds.clearContent();
     const sp = useStore.getState().currentSessionPath;
     if (sp) clearDraft(sp);
     ws.send(JSON.stringify({ type: 'steer', text, sessionPath: sp }));

@@ -4,6 +4,8 @@
  */
 import { create } from 'zustand';
 import type { ServerConnection } from '../services/server-connection';
+import registry from '../../shared/theme-registry';
+import { isPaperTextureEnabled } from '../../shared/appearance-preferences';
 
 export interface Agent {
   id: string;
@@ -93,6 +95,12 @@ export interface SettingsState {
   pluginUserDir: string;
   pluginSettingsTabs: PluginSettingsTab[];
 
+  // appearance (reactive mirror of localStorage preferences)
+  currentTheme: string;
+  serifEnabled: boolean;
+  paperTextureEnabled: boolean;
+  leavesOverlayEnabled: boolean;
+
   // toast
   toastMessage: string;
   toastType: 'success' | 'error' | '';
@@ -148,6 +156,12 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   pluginUserDir: '',
   pluginSettingsTabs: [],
 
+  // appearance (defaults; call initAppearanceState to hydrate from localStorage)
+  currentTheme: '',
+  serifEnabled: false,
+  paperTextureEnabled: false,
+  leavesOverlayEnabled: false,
+
   // toast
   toastMessage: '',
   toastType: '',
@@ -169,3 +183,12 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
     }, 1500);
   },
 }));
+
+export function initAppearanceState() {
+  useSettingsStore.setState({
+    currentTheme: registry.migrateSavedTheme(localStorage.getItem(registry.STORAGE_KEY)),
+    serifEnabled: localStorage.getItem('hana-font-serif') !== '0',
+    paperTextureEnabled: isPaperTextureEnabled(localStorage),
+    leavesOverlayEnabled: localStorage.getItem('hana-leaves-overlay') === '1',
+  });
+}

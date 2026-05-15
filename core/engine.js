@@ -666,6 +666,8 @@ export class HanaEngine {
   setLocale(l) { this._prefs.setLocale(l); }
   getEditor() { return this._prefs.getEditor(); }
   setEditor(p) { return this._prefs.setEditor(p); }
+  getChat() { return this._prefs.getChat(); }
+  setChat(p) { return this._prefs.setChat(p); }
   getWorkspaceUiState(workspaceRoot) { return this._prefs.getWorkspaceUiState(workspaceRoot); }
   setWorkspaceUiState(workspaceRoot, state) { return this._prefs.setWorkspaceUiState(workspaceRoot, state); }
   getPluginUiPrefs() { return this._prefs.getPluginUiPrefs(); }

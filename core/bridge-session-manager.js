@@ -158,6 +158,8 @@ export class BridgeSessionManager {
     this._deps = deps;
     this._activeSessions = new Map();
     this._prePromptAbortControllers = new Map();
+    this._sessionParkTimers = new Map(); // sessionKey → timeoutId
+    this._SESSION_PARK_TIMEOUT = 5 * 60 * 1000; // 5 分钟
   }
 
   /** 活跃 bridge sessions（供 bridge-manager abort 用） */
@@ -170,6 +172,31 @@ export class BridgeSessionManager {
     } catch (err) {
       console.warn(`[bridge-session] emit ${event?.type || "event"} failed: ${err?.message || err}`);
     }
+  }
+
+  /**
+   * Park session：不立即销毁，保持存活等待 deferred result。
+   * 设置 idle 超时，超时后真正销毁。
+   */
+  _parkSession(sessionKey, session, unsub, sessionPath) {
+    // 清除旧的 park 定时器
+    const oldTimer = this._sessionParkTimers.get(sessionKey);
+    if (oldTimer) clearTimeout(oldTimer);
+
+    // 设置 idle 超时：5 分钟后如果没活动就销毁
+    const timer = setTimeout(async () => {
+      this._activeSessions.delete(sessionKey);
+      this._sessionParkTimers.delete(sessionKey);
+      await teardownSessionResources({
+        session, unsub,
+        label: `bridge.parkTimeout[${sessionKey}]`,
+        warn: (msg) => console.warn(`[bridge-session] ${msg}`),
+      });
+    }, this._SESSION_PARK_TIMEOUT);
+    if (timer.unref) timer.unref();
+
+    this._sessionParkTimers.set(sessionKey, timer);
+    this._emitSessionEvent({ type: "session_status", isStreaming: false }, sessionPath);
   }
 
   /** 指定 bridge session 是否正在 streaming */
@@ -525,6 +552,10 @@ export class BridgeSessionManager {
           if (card?.description) {
             capturedText += (capturedText ? "\n\n" : "") + card.description;
           }
+        } else if (event.type === "message_end" && event.message?.role === "assistant") {
+          // LLM 回复结束（可能是初始 prompt 或 deferred result 触发的新 turn）
+          // 通知 bridge manager 刷新投递
+          try { opts.onFinish?.(capturedText); } catch {}
         }
         const messageEndError = getProviderMessageEndError(event);
         if (messageEndError) providerErrorMessage = messageEndError;
@@ -554,14 +585,8 @@ export class BridgeSessionManager {
         await session.prompt(promptText, promptOpts);
       } finally {
         this._prePromptAbortControllers.delete(sessionKey);
-        await teardownSessionResources({
-          session,
-          unsub,
-          label: `bridge.executeExternalMessage[${sessionKey}]`,
-          warn: (msg) => console.warn(`[bridge-session] ${msg}`),
-        });
-        this._activeSessions.delete(sessionKey);
-        this._emitSessionEvent({ type: "session_status", isStreaming: false }, activeSessionPath);
+        // 不立即销毁，park session 等待 deferred result
+        this._parkSession(sessionKey, session, unsub, activeSessionPath);
       }
 
       // 更新索引 + 元数据

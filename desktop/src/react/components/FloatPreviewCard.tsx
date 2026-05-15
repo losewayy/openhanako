@@ -11,6 +11,7 @@ import { createNewSession, switchSession } from '../stores/session-actions';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
 import { saveJianContent } from '../stores/desk-actions';
 import { openSettingsModal } from '../stores/settings-modal-actions';
+import { EmptyState } from './EmptyState';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -106,7 +107,7 @@ function SessionListCard({ onAction }: { onAction: () => void }) {
   const activeSessionPath = pendingSessionSwitchPath || currentSessionPath;
 
   if (sessions.length === 0) {
-    return <div className="float-card-empty">{t('common.noChats')}</div>;
+    return <EmptyState title={t('common.noChats')} className="float-card-empty" />;
   }
 
   return (
@@ -175,7 +176,7 @@ function DeskListCard() {
   return (
     <>
       {deskFiles.length === 0 ? (
-        <div className="float-card-empty">{t('desk.emptyTitle')}</div>
+        <EmptyState title={t('desk.emptyTitle')} className="float-card-empty" />
       ) : (
         <div className="float-card-list">
           {deskFiles.slice(0, 12).map((f: any) => (

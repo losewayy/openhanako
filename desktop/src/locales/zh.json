@@ -618,6 +618,7 @@
       "computer": "使用电脑",
       "skills": "技能",
       "mcp": "连接器",
+      "tokenUsage": "用量",
       "bridge": "社交平台",
       "sharing": "分享",
       "plugins": "插件",
@@ -655,7 +656,19 @@
       "paperTextureHint": "为背景添加宣纸质感",
       "paperTextureDarkDisabledHint": "黑夜模式不支持纸质纹理，切回浅色主题后会按原设置恢复",
       "leavesOverlay": "晴天模式",
-      "leavesOverlayHint": "没事儿晒晒太阳"
+      "leavesOverlayHint": "没事儿晒晒太阳",
+      "groupFunctional": "功能性",
+      "groupPersonalized": "个性化",
+      "warmPaperDesc": "经典暖纸浅色主题",
+      "midnightDesc": "深色主题，青夜配色",
+      "highContrastDesc": "高对比度，增强可读性",
+      "grassAromaDesc": "草香绿色调",
+      "contemplationDesc": "沉思冷灰调",
+      "absolutelyDesc": "Absolutely 暖白调",
+      "delveDesc": "Delve 纯白极简",
+      "deepThinkDesc": "深思冷白调",
+      "newWarmPaperDesc": "默认浅色主题，温暖的纸质基调",
+      "midnightContrastDesc": "高对比深色主题"
     },
     "editor": {
       "title": "编辑器",
@@ -677,6 +690,15 @@
       "markdownLineHeightHint": "控制编辑区每一行文字的垂直距离。",
       "markdownContentPadding": "内容边距",
       "markdownContentPaddingHint": "控制编辑区正文左右留白。"
+    },
+    "chat": {
+      "title": "聊天区",
+      "chatMaxWidth": "消息最大宽度",
+      "chatMaxWidthHint": "控制聊天消息区的最大宽度（单位 px）。",
+      "chatFontSize": "文字字号",
+      "chatFontSizeHint": "控制聊天消息的字号（单位 rem）。",
+      "chatLineHeight": "行高",
+      "chatLineHeightHint": "控制聊天消息每行文字的垂直距离。"
     },
     "locale": {
       "title": "语言和地区",
@@ -755,12 +777,30 @@
         "title": "工具",
         "description": "这些工具开关会在重启对话或新建对话后生效。当前进行中的会话继续使用创建时的工具集。",
         "items": {
-          "browser": { "label": "浏览器", "summary": "控制无头浏览器浏览网页" },
-          "computer": { "label": "电脑控制", "summary": "控制已批准的桌面应用，并显示实时动作光标" },
-          "cron": { "label": "定时任务", "summary": "在指定时间自动执行任务" },
-          "dm": { "label": "私信", "summary": "向其他 Agent 发送一对一消息" },
-          "install_skill": { "label": "安装技能", "summary": "从 GitHub 或技能库安装新技能" },
-          "update_settings": { "label": "修改设置", "summary": "让 Agent 修改应用配置项" }
+          "browser": {
+            "label": "浏览器",
+            "summary": "控制无头浏览器浏览网页"
+          },
+          "computer": {
+            "label": "电脑控制",
+            "summary": "控制已批准的桌面应用，并显示实时动作光标"
+          },
+          "cron": {
+            "label": "定时任务",
+            "summary": "在指定时间自动执行任务"
+          },
+          "dm": {
+            "label": "私信",
+            "summary": "向其他 Agent 发送一对一消息"
+          },
+          "install_skill": {
+            "label": "安装技能",
+            "summary": "从 GitHub 或技能库安装新技能"
+          },
+          "update_settings": {
+            "label": "修改设置",
+            "summary": "让 Agent 修改应用配置项"
+          }
         }
       },
       "computerUse": {
@@ -800,6 +840,21 @@
       "launchAtLogin": "开机自启",
       "betaUpdates": "接收测试版更新",
       "autoCheckUpdates": "自动检查更新"
+    },
+    "tokenUsage": {
+      "title": "Token 用量",
+      "totalCalls": "总调用次数",
+      "promptTokens": "输入 Token",
+      "completionTokens": "输出 Token",
+      "totalTokens": "总消耗",
+      "modelTrend": "模型用量趋势",
+      "tokenTypeTrend": "Token 类型趋势",
+      "byModel": "按模型",
+      "byDate": "按日期",
+      "date": "日期",
+      "model": "模型",
+      "noData": "暂无用量数据",
+      "loadFailed": "加载失败"
     },
     "security": {
       "sandbox": "沙盒",
@@ -1760,7 +1815,8 @@
     "settingsApplyFailed": "设置修改失败: {msg}",
     "settingsCancelled": "用户取消了「{label}」的修改",
     "settingsTimeout": "「{label}」修改确认超时，设置未变更",
-    "subagentMaxConcurrent": "当前已有 {max} 个子 agent 在运行，请等待完成后再发起。",
+    "subagentMaxConcurrent": "当前会话已有 {max} 个子 agent 在运行，请等待完成后再发起。",
+    "subagentMaxGlobal": "全局已有 {max} 个子 agent 在运行，请等待完成后再发起。",
     "subagentFailed": "子 agent 执行失败: {msg}",
     "subagentTimeout": "子 agent 执行超时（{minutes} 分钟）",
     "subagentAborted": "子 agent 已被终止",

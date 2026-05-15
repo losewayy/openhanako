@@ -15,6 +15,8 @@ import { normalizeSessionPermissionMode } from "./session-permission-mode.js";
 import {
   mergeEditorTypography,
   normalizeEditorTypography,
+  mergeChatTypography,
+  normalizeChatTypography,
 } from "../shared/editor-typography.js";
 import {
   normalizeWorkspaceUiState,
@@ -254,6 +256,20 @@ export class PreferencesManager {
     prefs.editor = mergeEditorTypography(prefs.editor, partial);
     this.savePreferences(prefs);
     return prefs.editor;
+  }
+
+  /** 读取聊天区排版偏好 */
+  getChat() {
+    return normalizeChatTypography({ chat: this._cache.chat }).chat;
+  }
+
+  /** 合并写入聊天区排版偏好 */
+  setChat(partial) {
+    const prefs = this._mutableCopy();
+    const merged = mergeChatTypography({ chat: prefs.chat }, { chat: partial });
+    prefs.chat = merged.chat;
+    this.savePreferences(prefs);
+    return prefs.chat;
   }
 
   /** 读取指定工作区的 UI 状态（文件夹展开、预览 tabs 等）。 */

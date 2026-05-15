@@ -6,6 +6,7 @@ import { t } from '../helpers';
 import styles from '../Settings.module.css';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
+import { EmptyState } from '../../components/EmptyState';
 
 const platform = window.platform;
 
@@ -460,9 +461,10 @@ export function PluginsTab() {
 
         {/* 已安装列表 */}
         {!loading && plugins.length === 0 ? (
-          <p className={`${styles['settings-muted-note']} ${styles['skills-empty']}`}>
-            {t('settings.plugins.empty')}
-          </p>
+          <EmptyState
+            title={t('settings.plugins.empty')}
+            className={styles['skills-empty']}
+          />
         ) : (
           <div className={styles['skills-list-block']}>
             {plugins.map(plugin => {

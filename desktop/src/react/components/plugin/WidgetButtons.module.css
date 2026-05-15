@@ -21,7 +21,7 @@
     font-family: var(--font-ui);
     font-size: 0.7rem;
     font-weight: 500;
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition: color var(--duration-fast), background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
     padding: 0;
     flex-shrink: 0;
 }
@@ -29,6 +29,12 @@
 .btn:hover {
     color: var(--text-light);
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 .active {
@@ -66,12 +72,18 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background var(--duration-instant), color var(--duration-instant);
+    transition: background var(--duration-instant), color var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .dropdownItem:hover {
     background: var(--overlay-light);
     color: var(--text);
+    transform: translateX(2px);
+}
+
+.dropdownItem:active {
+    transform: translateX(0) scale(0.98);
+    transition-duration: var(--duration-instant);
 }
 
 .dropdownRow {
@@ -98,7 +110,7 @@
     color: var(--text-muted);
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--duration-instant), color var(--duration-instant), background var(--duration-instant);
+    transition: opacity var(--duration-instant), color var(--duration-instant), background var(--duration-instant), transform var(--duration-fast) var(--ease-spring);
 }
 
 .dropdownRow:hover .pinBtn {
@@ -108,6 +120,12 @@
 .pinBtn:hover {
     color: var(--text);
     background: var(--overlay-light);
+    transform: translateY(-1px);
+}
+
+.pinBtn:active {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 .divider {

@@ -19,6 +19,7 @@ import { buildSessionSections } from './session-sections';
 import { ContextMenu, type ContextMenuItem } from '../ui/ContextMenu';
 import { renderMarkdown } from '../utils/markdown';
 import styles from './SessionList.module.css';
+import { EmptyState } from './EmptyState';
 
 interface BrowserSessionState {
   url: string | null;
@@ -126,7 +127,7 @@ function SessionListInner() {
   }, []);
 
   if (sessions.length === 0) {
-    return <div className={styles.sessionEmpty}>{t('sidebar.empty')}</div>;
+    return <EmptyState title={t('sidebar.empty')} className={styles.sessionEmpty} />;
   }
 
   const sections = buildSessionSections(sessions, { mode: 'time' });

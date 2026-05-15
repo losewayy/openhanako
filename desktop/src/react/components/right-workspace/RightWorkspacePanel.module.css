@@ -58,7 +58,9 @@
     border-radius: var(--radius-sm);
     background: var(--overlay-subtle);
     border: 1px solid var(--overlay-light);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 2px 4px rgba(0,0,0,0.06);
     overflow: hidden;
 }
 
@@ -73,8 +75,8 @@
     background: var(--tab-slider-bg, var(--bg-card));
     box-shadow: var(--tab-slider-shadow, 0 1px 3px var(--shadow));
     transform: translateX(var(--right-workspace-tab-slider-offset));
-    transition: transform var(--duration-slow) cubic-bezier(0.4, 0, 0.2, 1),
-                width var(--duration-slow) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--duration-slow) var(--ease-liquid),
+                width var(--duration-slow) var(--ease-liquid);
 }
 
 .tab {
@@ -90,18 +92,26 @@
     font-size: 0.7rem;
     font-weight: 400;
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-spring);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .tab:hover {
-    color: var(--text-muted);
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+.tab:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: var(--duration-instant);
 }
 
 .tabActive {
     color: var(--text-muted);
+    transform: none;
 }
 
 .content {
@@ -155,13 +165,19 @@
     font-size: 0.65rem;
     line-height: 1;
     cursor: pointer;
-    transition: background var(--duration-fast), color var(--duration-fast);
+    transition: background var(--duration-fast), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
     white-space: nowrap;
 }
 
 .sessionFilesSortButton:hover {
     background: var(--overlay-subtle);
     color: var(--text);
+    transform: translateY(-1px);
+}
+
+.sessionFilesSortButton:active {
+    transform: translateY(0) scale(0.94);
+    transition-duration: var(--duration-instant);
 }
 
 .sessionFilesSortButton svg {
@@ -197,6 +213,7 @@
     height: auto;
     min-height: 0;
     overflow-y: auto;
+    scroll-behavior: smooth;
     display: block;
     padding: 4px 2px calc(var(--right-workspace-jian-reserved, 56px) + 8px);
     scroll-padding-bottom: calc(var(--right-workspace-jian-reserved, 56px) + 8px);
@@ -217,11 +234,17 @@
     line-height: 1.4;
     cursor: default;
     user-select: none;
-    transition: background 0.14s var(--ease-out), color 0.14s var(--ease-out);
+    transition: background 0.14s var(--ease-out), color 0.14s var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .fileRow:hover {
     background: var(--overlay-subtle);
+    transform: translateY(-1px);
+}
+
+.fileRow:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: var(--duration-instant);
 }
 
 .fileRowSelected {
@@ -302,17 +325,24 @@
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.16s var(--ease-out), background 0.16s var(--ease-out);
+    transition: color 0.16s var(--ease-out), background 0.16s var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .fileAction:hover:not(:disabled) {
     color: var(--accent);
     background: rgba(var(--accent-rgb), 0.08);
+    transform: translateY(-1px);
+}
+
+.fileAction:active:not(:disabled) {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 .fileAction:disabled {
     opacity: 0.35;
-    cursor: default;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .fileRubberBand {
@@ -325,28 +355,28 @@
 }
 
 .jianDrawer {
-    --right-workspace-jian-open-dur: 400ms;
-    --right-workspace-jian-close-dur: var(--duration-slow);
-    --right-workspace-jian-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --right-workspace-jian-open-dur: 0.35s;
+    --right-workspace-jian-close-dur: 0.2s;
+    --right-workspace-jian-ease: cubic-bezier(0.2, 0, 0, 1);
     position: absolute;
     left: var(--space-sm);
     right: var(--space-sm);
     bottom: var(--right-workspace-jian-bottom);
     z-index: 2;
     height: var(--right-workspace-jian-open-height);
-    max-height: none;
+    max-height: var(--right-workspace-jian-open-height);
     overflow: hidden;
     margin: 0;
     border-radius: var(--radius-md);
     border: 1px solid var(--jian-note-border, rgba(200, 160, 110, 0.2));
     background: var(--jian-note-bg, #FAF0E2);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: height var(--right-workspace-jian-open-dur) var(--right-workspace-jian-ease);
+    box-shadow: var(--shadow-md);
+    transition: max-height var(--right-workspace-jian-open-dur) var(--right-workspace-jian-ease);
 }
 
 .jianDrawer[data-open="false"] {
-    height: var(--right-workspace-jian-closed-height);
-    transition-duration: var(--right-workspace-jian-close-dur);
+    max-height: var(--right-workspace-jian-closed-height);
+    transition: max-height var(--right-workspace-jian-close-dur) var(--ease-out);
 }
 
 .jianDrawer[data-open="false"] .jianHeader {
@@ -389,24 +419,33 @@
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
-    transition: border-color 0.16s var(--ease-out), color 0.16s var(--ease-out);
+    transition: border-color 0.16s var(--ease-out), color 0.16s var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .jianToggle:hover {
-    color: var(--text-muted);
-    border-color: var(--overlay-light);
+    color: var(--text);
+    border-color: var(--overlay-medium);
+    transform: translateY(-1px);
+}
+
+.jianToggle:active {
+    transform: translateY(0) scale(0.9);
+    transition-duration: var(--duration-instant);
 }
 
 .jianBody {
     height: calc(var(--right-workspace-jian-open-height) - 48px);
     transform: translateY(0);
-    transition: transform var(--right-workspace-jian-open-dur) var(--right-workspace-jian-ease);
+    opacity: 1;
+    transition: transform var(--right-workspace-jian-open-dur) var(--right-workspace-jian-ease),
+                opacity var(--right-workspace-jian-open-dur) var(--ease-out) 0.08s;
 }
 
 .jianDrawer[data-open="false"] .jianBody {
     transform: translateY(24px);
     pointer-events: none;
-    transition-duration: var(--right-workspace-jian-close-dur);
+    transition: transform var(--right-workspace-jian-close-dur) var(--ease-out),
+                opacity var(--right-workspace-jian-close-dur) var(--ease-out) 0.05s;
 }
 
 .jianBody :global([data-desk-editor]) {

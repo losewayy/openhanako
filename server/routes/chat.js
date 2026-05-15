@@ -586,7 +586,7 @@ export function createChatRoute(engine, hub, { upgradeWebSocket }) {
       try {
         const sess = engine.getSessionByPath(sessionPath);
         if (sess) {
-          const usage = getLastAssistantUsage(sess.entries ?? []);
+          const usage = getLastAssistantUsage(sess.sessionManager?.getEntries() ?? []);
           if (usage) {
             const model = sess.model;
             logLlmUsage({
@@ -597,12 +597,8 @@ export function createChatRoute(engine, hub, { upgradeWebSocket }) {
               usage,
               costRates: model?.cost,
             });
-            hub.eventBus.emit({
-              type: "token_usage",
-              usage,
-              modelId: model?.id ?? null,
-              modelProvider: model?.provider ?? null,
-            }, sessionPath);
+
+            // 全局用量追踪已由 usage-observer 的 setOnUsage 回调统一处理
           }
         }
       } catch (_) { /* 统计失败不阻塞主流程 */ }

@@ -3,12 +3,12 @@
   margin: var(--space-sm) 0;
   border-radius: var(--radius-chat-card);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-md), var(--shadow-sm);
 }
 .iframe {
   display: block;
   border: none;
-  transition: opacity var(--duration-fast) ease, width var(--duration-fast) ease, height var(--duration-fast) ease;
+  transition: opacity var(--duration-fast) var(--ease-out), width var(--duration-fast) var(--ease-out), height var(--duration-fast) var(--ease-out);
 }
 .title {
   padding: 0.35rem 0.5rem 0.2rem;

@@ -78,3 +78,48 @@ export function mergeEditorTypography(base, patch) {
     },
   });
 }
+
+const DEFAULT_CHAT_TYPOGRAPHY = Object.freeze({
+  chatMaxWidth: 800,
+  chatFontSize: 0.95,
+  chatLineHeight: 1.75,
+});
+
+export const DEFAULT_CHAT_TYPOGRAPHY_CONFIG = Object.freeze({
+  chat: DEFAULT_CHAT_TYPOGRAPHY,
+});
+
+const CHAT_LIMITS = Object.freeze({
+  chatMaxWidth: [400, 1200],
+  chatFontSize: [0.75, 1.3],
+  chatLineHeight: [1.2, 2.2],
+});
+
+export function normalizeChatTypography(value) {
+  const source = isRecord(value) ? value : {};
+  const chat = isRecord(source.chat) ? source.chat : {};
+  const defaults = DEFAULT_CHAT_TYPOGRAPHY;
+
+  return {
+    chat: {
+      chatMaxWidth: clampNumber(chat.chatMaxWidth, defaults.chatMaxWidth, CHAT_LIMITS.chatMaxWidth),
+      chatFontSize: clampNumber(chat.chatFontSize, defaults.chatFontSize, CHAT_LIMITS.chatFontSize, 2),
+      chatLineHeight: clampNumber(chat.chatLineHeight, defaults.chatLineHeight, CHAT_LIMITS.chatLineHeight, 2),
+    },
+  };
+}
+
+export function mergeChatTypography(base, patch) {
+  const current = normalizeChatTypography(base);
+  const source = isRecord(patch) ? patch : {};
+  const chatPatch = isRecord(source.chat) ? source.chat : {};
+
+  return normalizeChatTypography({
+    ...current,
+    ...source,
+    chat: {
+      ...current.chat,
+      ...chatPatch,
+    },
+  });
+}

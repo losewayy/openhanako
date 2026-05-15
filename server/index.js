@@ -50,6 +50,8 @@ import { createPluginsRoute } from "./routes/plugins.js";
 import { createCheckpointsRoute } from "./routes/checkpoints.js";
 import { createCommandsRoute } from "./routes/commands.js";
 import { createServerIdentityRoute } from "./routes/server-identity.js";
+import { createTokenUsageRoute, initTokenUsageStore } from "./routes/token-usage.js";
+import { setOnUsage } from "../lib/llm/usage-observer.js";
 import { configureProcessPiSdkEnv, ensureHanaPiSdkDirs, resolveHanakoHome } from "../shared/hana-runtime-paths.js";
 // internal-browser WS is handled directly via raw ws.WebSocketServer in the
 // upgrade handler below (WsTransport needs raw ws .on()/.off() methods)
@@ -387,6 +389,22 @@ app.route("/api", createPluginsRoute(engine));
 app.route("/api", createCheckpointsRoute(engine));
 app.route("/api", createCommandsRoute(engine));
 app.route("/api", createServerIdentityRoute({ hanakoHome: engine.hanakoHome, appVersion }));
+
+// ── Token Usage 存储 + API ──
+const tokenUsageStore = initTokenUsageStore(hub, engine.hanakoHome);
+
+// 全局 LLM 用量追踪：聊天、频道、utility 等所有 LLM 调用统一记录
+setOnUsage((record) => {
+  if (!record?.modelId) return;
+  hub.eventBus.emit({
+    type: "token_usage",
+    usage: record,
+    modelId: record.modelId,
+    modelProvider: record.provider,
+  }, null);
+});
+
+app.route("/api", createTokenUsageRoute(tokenUsageStore));
 // internal-browser WS — see unified upgrade handler in server startup below
 
 // 健康检查 + 身份信息

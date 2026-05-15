@@ -5,7 +5,7 @@ import { loadSessions, switchSession } from '../stores/session-actions';
 import { loadModels } from '../utils/ui-helpers';
 import { activateWorkspaceDesk } from '../stores/desk-actions';
 import { loadChannels } from '../stores/channel-actions';
-import { applyEditorTypography } from '../editor/typography';
+import { applyEditorTypography, applyChatTypography } from '../editor/typography';
 // @ts-expect-error — shared JS module
 import { mergeWorkspaceHistory } from '../../../../shared/workspace-history.js';
 
@@ -197,6 +197,9 @@ export function handleAppEvent(type: string, data: any = {}): void {
       break;
     case 'editor-typography-changed':
       applyEditorTypography(data.editor ?? data);
+      break;
+    case 'chat-typography-changed':
+      applyChatTypography({ chat: data.chat });
       break;
     case 'paper-texture-changed':
       window.setPaperTexture(data.enabled);

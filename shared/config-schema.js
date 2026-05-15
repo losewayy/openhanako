@@ -29,6 +29,7 @@ export const CONFIG_SCHEMA = {
   auto_check_updates:           { scope: 'global', setter: 'setAutoCheckUpdates', getter: 'getAutoCheckUpdates', defaultValue: true },
   thinking_level:               { scope: 'global', setter: 'setThinkingLevel',  getter: 'getThinkingLevel', defaultValue: 'auto' },
   editor:                       { scope: 'global', setter: 'setEditor',         getter: 'getEditor' },
+  chat:                         { scope: 'global', setter: 'setChat',           getter: 'getChat' },
   'capabilities.learn_skills':  { scope: 'global', setter: 'setLearnSkills',    getter: 'getLearnSkills', prefsPath: 'learn_skills' },
   'desk.heartbeat_master':      { scope: 'global', setter: 'setHeartbeatMaster', getter: 'getHeartbeatMaster', prefsPath: 'heartbeat_master', defaultValue: true },
   'channels.enabled':           { scope: 'global', setter: 'setChannelsEnabled', getter: 'getChannelsEnabled', prefsPath: 'channels_enabled', defaultValue: false },

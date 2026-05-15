@@ -34,6 +34,11 @@ desktop/preload.bundle.cjs
 desktop/dist-renderer/
 desktop/native/**/.build/
 vendor/
+dist-sandbox/
+*.bat
+*.cmd
+*.exe
+*.obj
 inbox/
 
 # 运行时 / 依赖

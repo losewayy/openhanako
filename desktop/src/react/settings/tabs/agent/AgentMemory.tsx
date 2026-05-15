@@ -4,6 +4,7 @@ import { hanaFetch } from '../../api';
 import { t, autoSaveConfig, savePins } from '../../helpers';
 import { PinItem } from './AgentPins';
 import { SettingsSection } from '../../components/SettingsSection';
+import { EmptyState } from '../../../components/EmptyState';
 import styles from '../../Settings.module.css';
 
 export function MemorySection({ hasUtilityModel, memoryEnabled, isViewingOther, currentPins }: {
@@ -56,7 +57,7 @@ export function MemorySection({ hasUtilityModel, memoryEnabled, isViewingOther, 
             </div>
             <div className={styles['pin-list']}>
               {currentPins.length === 0 ? (
-                <div className={styles['pin-empty']}>{t('settings.pins.empty')}</div>
+                <EmptyState title={t('settings.pins.empty')} className={styles['pin-empty']} />
               ) : (
                 currentPins.map((pin, i) => (
                   <PinItem key={pin} text={pin} index={i} onDelete={deletePin} />

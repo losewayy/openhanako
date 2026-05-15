@@ -54,7 +54,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 3px;
-  transition: width var(--duration-slow) ease;
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 .action {
@@ -71,13 +71,25 @@
   justify-content: center;
   gap: 4px;
   font: inherit;
-  transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast);
+  transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring);
 }
 
 .action:hover {
   color: var(--text);
   border-color: var(--text-muted);
   background: var(--overlay-light, rgba(0, 0, 0, 0.04));
+  transform: translateY(-1px);
+}
+
+.action:active {
+  transform: translateY(0) scale(0.96);
+  transition-duration: var(--duration-instant);
+}
+
+.action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .hint {

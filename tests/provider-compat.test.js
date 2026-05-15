@@ -854,3 +854,136 @@ describe("normalizeProviderPayload — 边界条件", () => {
     expect(result).toBe(payload);
   });
 });
+
+describe("normalizeProviderContextMessages — 通用历史清洗", () => {
+  it("过滤孤立的 tool_result（Anthropic 格式）", () => {
+    const messages = [
+      { role: "assistant", content: [{ type: "tool_use", id: "toolu_123", name: "read" }] },
+      { role: "user", content: [{ type: "tool_result", tool_use_id: "toolu_123", content: "result" }, { type: "tool_result", tool_use_id: "orphan_id", content: "orphan" }] },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: "minimax" });
+
+    // 第二条消息的 content 应该只剩一个 tool_result
+    expect(result.length).toBe(2);
+    expect(result[1].content.length).toBe(1);
+    expect(result[1].content[0].tool_use_id).toBe("toolu_123");
+  });
+
+  it("过滤孤立的 tool_result（OpenAI 格式）", () => {
+    const messages = [
+      { role: "assistant", tool_calls: [{ id: "call_123", type: "function", function: { name: "read" } }] },
+      { role: "tool", tool_call_id: "call_123", content: "result" },
+      { role: "tool", tool_call_id: "orphan_id", content: "orphan" },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: "openai" });
+
+    expect(result.length).toBe(2);
+  });
+
+  it("对所有 provider 都生效", () => {
+    const messages = [
+      { role: "assistant", tool_calls: [{ id: "call_123", type: "function", function: { name: "read" } }] },
+      { role: "tool", tool_call_id: "orphan_id", content: "orphan" },
+    ];
+
+    // 测试多个 provider
+    for (const provider of ["minimax", "openai", "deepseek", "mistral", "anthropic"]) {
+      const result = normalizeProviderContextMessages(messages, { provider });
+      expect(result.length).toBe(1);
+    }
+  });
+
+  it("保留正常的 tool_result", () => {
+    const messages = [
+      { role: "assistant", content: [{ type: "tool_use", id: "toolu_123", name: "read" }] },
+      { role: "user", content: [{ type: "tool_result", tool_use_id: "toolu_123", content: "result" }] },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: "minimax" });
+
+    expect(result.length).toBe(2);
+  });
+
+  it("过滤孤立的 toolResult（Pi SDK 内部格式）", () => {
+    const messages = [
+      { role: 'assistant', content: [{ type: 'toolCall', id: 'call_abc', name: 'read' }] },
+      { role: 'toolResult', toolCallId: 'call_abc', content: [{ type: 'text', text: 'result' }] },
+      { role: 'toolResult', toolCallId: 'orphan_call', content: [{ type: 'text', text: 'orphan' }] },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: 'minimax' });
+
+    expect(result.length).toBe(2);
+    expect(result[1].toolCallId).toBe('call_abc');
+  });
+
+  it("过滤空字符串 toolCallId 的孤立 toolResult（Pi SDK 格式）", () => {
+    const messages = [
+      { role: 'assistant', content: [{ type: 'toolCall', id: 'call_valid', name: 'read' }] },
+      { role: 'toolResult', toolCallId: 'call_valid', content: [{ type: 'text', text: 'valid result' }] },
+      { role: 'toolResult', toolCallId: '', content: [{ type: 'text', text: 'empty id result' }] },
+      { role: 'toolResult', toolCallId: '  ', content: [{ type: 'text', text: 'whitespace id result' }] },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: 'minimax' });
+
+    expect(result.length).toBe(2);
+    expect(result[0].content[0].id).toBe('call_valid');
+    expect(result[1].toolCallId).toBe('call_valid');
+  });
+
+  it("清洗 assistant 消息中的空 toolCall（真实场景：SenseNova 吐出畸形 toolCall）", () => {
+    // 这就是那个被污染 session 的真实数据
+    const messages = [
+      {
+        role: 'assistant',
+        content: [
+          { type: 'text', text: '思考过程' },
+          { type: 'toolCall', id: 'call_valid_1', name: 'find', arguments: {} },
+          { type: 'toolCall', id: 'call_valid_2', name: 'grep', arguments: {} },
+          { type: 'toolCall', id: '', name: '', arguments: {} },  // ← 畸形
+        ],
+      },
+      { role: 'toolResult', toolCallId: 'call_valid_1', toolName: 'find', content: [{ type: 'text', text: 'result1' }] },
+      { role: 'toolResult', toolCallId: 'call_valid_2', toolName: 'grep', content: [{ type: 'text', text: 'result2' }] },
+      { role: 'toolResult', toolCallId: '', toolName: '', content: [{ type: 'text', text: 'Tool not found' }], isError: true },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: 'sensenova' });
+
+    // assistant 消息应该只剩 2 个 toolCall（空的那个被清理）
+    expect(result[0].content.length).toBe(3);  // text + 2 valid toolCalls
+    const toolCalls = result[0].content.filter(b => b.type === 'toolCall');
+    expect(toolCalls.length).toBe(2);
+    expect(toolCalls[0].id).toBe('call_valid_1');
+    expect(toolCalls[1].id).toBe('call_valid_2');
+
+    // toolResult 应该只剩 2 条有效（空的那条被过滤）
+    const toolResults = result.filter(m => m.role === 'toolResult');
+    expect(toolResults.length).toBe(2);
+    expect(toolResults[0].toolCallId).toBe('call_valid_1');
+    expect(toolResults[1].toolCallId).toBe('call_valid_2');
+
+    // 总消息数: assistant(1) + 2 toolResults = 3
+    expect(result.length).toBe(3);
+  });
+
+  it("混合格式：同时处理 Pi SDK + API 格式", () => {
+    const messages = [
+      // Pi SDK 格式
+      { role: 'assistant', content: [{ type: 'toolCall', id: 'pi_call_1', name: 'read' }] },
+      { role: 'toolResult', toolCallId: 'pi_call_1', content: [{ type: 'text', text: 'pi result' }] },
+      { role: 'toolResult', toolCallId: 'orphan_pi', content: [{ type: 'text', text: 'orphan pi' }] },
+      // OpenAI 格式
+      { role: 'assistant', tool_calls: [{ id: 'openai_call_1', type: 'function', function: { name: 'read' } }] },
+      { role: 'tool', tool_call_id: 'openai_call_1', content: 'openai result' },
+      { role: 'tool', tool_call_id: 'orphan_openai', content: 'orphan openai' },
+    ];
+    const result = normalizeProviderContextMessages(messages, { provider: 'openai' });
+
+    // 两对正常 + 两个孤立被滤掉 = 4 条
+    expect(result.length).toBe(4);
+  });
+
+  it("非数组输入原样返回", () => {
+    expect(normalizeProviderContextMessages(null, {})).toBe(null);
+    expect(normalizeProviderContextMessages(undefined, {})).toBe(undefined);
+    expect(normalizeProviderContextMessages("string", {})).toBe("string");
+  });
+});

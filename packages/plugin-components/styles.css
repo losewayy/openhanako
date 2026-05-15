@@ -11,9 +11,9 @@
   --hana-plugin-danger: var(--danger, #8B3A3A);
   --hana-plugin-radius-input: var(--radius-input, 4px);
   --hana-plugin-radius-card: var(--radius-card, 8px);
-  --hana-plugin-font-ui: var(--font-ui, Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif);
-  --hana-plugin-font-serif: var(--font-serif, "Songti SC", "STSong", serif);
-  --hana-plugin-font-mono: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  --hana-plugin-font-ui: var(--font-ui, MiSans, Inter, system-ui, -apple-system, sans-serif);
+  --hana-plugin-font-serif: var(--font-serif, "EB Garamond", "Noto Serif SC", serif);
+  --hana-plugin-font-mono: var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
   display: block;
   min-width: 0;
   box-sizing: border-box;

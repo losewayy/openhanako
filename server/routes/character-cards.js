@@ -10,7 +10,7 @@ const MAX_CARD_PACKAGE_SIZE = 80 * 1024 * 1024;
 
 function safeUploadName(name) {
   const base = path.basename(String(name || "character-card.zip").replace(/\\/g, "/"));
-  const cleaned = base.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").trim();
+  const cleaned = [...base].filter(c => !/[<>:"/\\|?*]/.test(c) && c.codePointAt(0) >= 32).join("").trim();
   return cleaned || "character-card.zip";
 }
 

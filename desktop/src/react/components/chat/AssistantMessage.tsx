@@ -13,7 +13,7 @@ import { SettingsConfirmCard } from './SettingsConfirmCard';
 import { MessageActions } from './MessageActions';
 import { BLOCK_RENDERERS } from './block-renderers';
 import { FileOutputActions } from './FileOutputActions';
-const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
+import { formatMessageTime, isValidTimestamp } from './timeline-anchors';
 import type { ChatMessage, ContentBlock } from '../../stores/chat-types';
 import { useStore } from '../../stores';
 import { hanaFetch } from '../../hooks/use-hana-fetch';
@@ -24,6 +24,7 @@ import { openPreview } from '../../stores/preview-actions';
 import { selectIsStreamingSession, selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { extractSelectedTexts } from '../../utils/message-text';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
+const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
 import styles from './Chat.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -100,6 +101,11 @@ export const AssistantMessage = memo(function AssistantMessage({ message, showAv
             alt={displayName}
           />
           <span className={styles.avatarName}>{displayName}</span>
+          {isValidTimestamp(message.timestamp) && (
+            <span className={styles.avatarTime}>
+              {formatMessageTime(message.timestamp)}
+            </span>
+          )}
         </div>
       )}
       <div className={`${styles.message} ${styles.messageAssistant}`}>

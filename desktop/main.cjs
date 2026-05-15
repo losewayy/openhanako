@@ -1031,6 +1031,13 @@ function createMainWindow() {
   });
   mainWindow.once("show", () => clearTimeout(initTimeout));
 
+  // F12 打开开发者工具（打包后调试用）
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (input.key === "F12") {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
+
   if (process.argv.includes("--dev")) {
     mainWindow.webContents.openDevTools();
   }

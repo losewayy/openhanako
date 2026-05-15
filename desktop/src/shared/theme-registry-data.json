@@ -20,61 +20,81 @@
       "cssPath": "themes/warm-paper.css",
       "backgroundColor": "#F8F5ED",
       "i18nName": "settings.appearance.warmPaper",
-      "i18nMode": "settings.appearance.warmPaperMode"
+      "i18nMode": "settings.appearance.warmPaperMode",
+      "group": "functional",
+      "i18nDescription": "settings.appearance.warmPaperDesc"
     },
     "midnight": {
       "cssPath": "themes/midnight.css",
       "backgroundColor": "#3B4A54",
       "i18nName": "settings.appearance.midnight",
-      "i18nMode": "settings.appearance.midnightMode"
+      "i18nMode": "settings.appearance.midnightMode",
+      "group": "functional",
+      "i18nDescription": "settings.appearance.midnightDesc"
     },
     "high-contrast": {
       "cssPath": "themes/high-contrast.css",
       "backgroundColor": "#FAF9F6",
       "i18nName": "settings.appearance.highContrast",
-      "i18nMode": "settings.appearance.highContrastMode"
+      "i18nMode": "settings.appearance.highContrastMode",
+      "group": "functional",
+      "i18nDescription": "settings.appearance.highContrastDesc"
     },
     "grass-aroma": {
       "cssPath": "themes/grass-aroma.css",
       "backgroundColor": "#F5F8F3",
       "i18nName": "settings.appearance.grassAroma",
-      "i18nMode": "settings.appearance.grassAromaMode"
+      "i18nMode": "settings.appearance.grassAromaMode",
+      "group": "personalized",
+      "i18nDescription": "settings.appearance.grassAromaDesc"
     },
     "contemplation": {
       "cssPath": "themes/contemplation.css",
       "backgroundColor": "#F3F5F7",
       "i18nName": "settings.appearance.contemplation",
-      "i18nMode": "settings.appearance.contemplationMode"
+      "i18nMode": "settings.appearance.contemplationMode",
+      "group": "personalized",
+      "i18nDescription": "settings.appearance.contemplationDesc"
     },
     "absolutely": {
       "cssPath": "themes/absolutely.css",
       "backgroundColor": "#F4F3EE",
       "i18nName": "settings.appearance.absolutely",
-      "i18nMode": "settings.appearance.absolutelyMode"
+      "i18nMode": "settings.appearance.absolutelyMode",
+      "group": "personalized",
+      "i18nDescription": "settings.appearance.absolutelyDesc"
     },
     "delve": {
       "cssPath": "themes/delve.css",
       "backgroundColor": "#FFFFFF",
       "i18nName": "settings.appearance.delve",
-      "i18nMode": "settings.appearance.delveMode"
+      "i18nMode": "settings.appearance.delveMode",
+      "group": "personalized",
+      "i18nDescription": "settings.appearance.delveDesc"
     },
     "deep-think": {
       "cssPath": "themes/deep-think.css",
       "backgroundColor": "#FCFCFD",
       "i18nName": "settings.appearance.deepThink",
-      "i18nMode": "settings.appearance.deepThinkMode"
+      "i18nMode": "settings.appearance.deepThinkMode",
+      "group": "personalized",
+      "i18nDescription": "settings.appearance.deepThinkDesc"
     },
     "new-warm-paper": {
       "cssPath": "themes/new-warm-paper.css",
       "backgroundColor": "#F5EFE4",
       "i18nName": "settings.appearance.newWarmPaper",
-      "i18nMode": "settings.appearance.newWarmPaperMode"
+      "i18nMode": "settings.appearance.newWarmPaperMode",
+      "group": "functional",
+      "i18nDescription": "settings.appearance.newWarmPaperDesc"
     },
     "midnight-contrast": {
       "cssPath": "themes/midnight-contrast.css",
       "backgroundColor": "#26343D",
       "i18nName": "settings.appearance.midnightContrast",
-      "i18nMode": "settings.appearance.midnightContrastMode"
+      "i18nMode": "settings.appearance.midnightContrastMode",
+      "group": "functional",
+      "i18nDescription": "settings.appearance.midnightContrastDesc"
     }
   }
 }

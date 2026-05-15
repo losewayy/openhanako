@@ -8,6 +8,7 @@ import { formatSessionDate, injectCopyButtons, parseMoodFromContent } from '../u
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
 import { getMd } from '../utils/markdown';
 import { useMermaidDiagrams } from '../hooks/use-mermaid-diagrams';
+import { EmptyState } from './EmptyState';
 import fp from './FloatingPanels.module.css';
 import chatStyles from './chat/Chat.module.css';
 
@@ -175,7 +176,7 @@ export function ActivityPanel() {
             <div className={fp.floatingPanelBody}>
               <div className={fp.activityCards} id="activityCards">
                 {activities.length === 0 ? (
-                  <div className={fp.activityEmpty}>{t('activity.empty')}</div>
+                  <EmptyState title={t('activity.empty')} className={fp.activityEmpty} />
                 ) : (
                   activities.map(a => (
                     <ActivityCard

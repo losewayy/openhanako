@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../hooks/use-i18n';
 import { Overlay } from '../ui';
+import { EmptyState } from './EmptyState';
 import {
   listArchivedSessions,
   restoreSession,
@@ -129,7 +130,7 @@ export function ArchivedSessionsModal({ open, onClose }: Props) {
               {loading ? (
                 <div className={styles.loading}>{t('common.loading')}</div>
               ) : list.length === 0 ? (
-                <div className={styles.empty}>{t('session.archived.empty')}</div>
+                <EmptyState title={t('session.archived.empty')} className={styles.empty} />
               ) : (
                 list.map((item) => (
                   <div key={item.path} className={styles.row}>
