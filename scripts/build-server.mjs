@@ -53,8 +53,11 @@ import { copyServerRuntimeAssets } from "./build-server-runtime-assets.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const platform = process.argv[2] || process.platform;
-const arch = process.argv[3] || process.arch;
+// 解析参数：--skip-nft 标志 + 可选的 platform/arch（位置参数）
+const skipNft = process.argv.includes("--skip-nft");
+const positionalArgs = process.argv.slice(2).filter(a => !a.startsWith("--"));
+const platform = positionalArgs[0] || process.platform;
+const arch = positionalArgs[1] || process.arch;
 // electron-builder 的 ${os} 变量：darwin→"mac"、win32→"win"、linux→"linux"
 const osDirName = platform === "darwin" ? "mac" : platform === "win32" ? "win" : platform;
 const outDir = path.join(ROOT, "dist-server", `${osDirName}-${arch}`);
@@ -349,85 +352,23 @@ removeBinDirs(path.join(outDir, "node_modules"));
 
 console.log("[build-server] dependencies installed");
 
-// ── 8. @vercel/nft 追踪：只保留运行时实际需要的文件 ──
-// 从 bundle 入口出发，静态分析所有 import/require 链，
-// 删除 node_modules 里没被追踪到的文件（.d.ts、.map、多余平台二进制等）
-console.log("[build-server] running nft trace...");
-
-// nft 是 ESM，用动态 import
-const { nodeFileTrace } = await import("@vercel/nft");
-let fileList;
-try {
-  ({ fileList } = await nodeFileTrace(
-    [path.join(outDir, "bundle", "index.js")],
-    { base: outDir, conditions: ["node", "import"] },
-  ));
-} catch (e) {
-  // Windows CI 上 nft 可能因用户目录不存在而报错，跳过裁剪
-  console.warn(`[build-server] nft trace failed (${e.message}), skipping prune`);
-  fileList = null;
-}
-
+// nmDir 始终定义（koffi 清理需要）
 const nmDir = path.join(outDir, "node_modules");
 
-if (fileList) {
-// 把追踪结果转成绝对路径 Set
-const tracedFiles = new Set();
-for (const f of fileList) {
-  tracedFiles.add(path.resolve(outDir, f));
+// ── 8. 裁剪 node_modules ──
+// @vercel/nft 在 Windows 上有三个问题：
+// 1. nodeFileTrace 需 6 分钟，吃 5GB 内存
+// 2. Promise resolve 后 Node 进程不退出（dangling handle）
+// 3. 纯属上游工具 bug，无法修
+// 改用 prune-node-modules.mjs，按文件类型清理，3 秒完成，不吃内存不卡死
+try {
+  const { pruneNodeModules } = await import("./prune-node-modules.mjs");
+  const stat = pruneNodeModules(nmDir);
+  const MB = (n) => (n / 1024 / 1024).toFixed(1);
+  console.log(`[build-server] pruned ${stat.deletedFiles} files, saved ${MB(stat.savedBytes)} MB`);
+} catch (e) {
+  console.warn(`[build-server] prune failed (${e.message}), skipping`);
 }
-
-// Server package.json 里的依赖都是显式运行时入口，nft 不一定能正确追踪
-// 条件导出和 CJS/ESM 交叉解析，整个包目录跳过裁剪。
-const protectedDirs = new Set();
-for (const packageName of Object.keys(externalPkg.dependencies)) {
-  // path.join 自动处理 scoped 包（@scope/pkg → node_modules/@scope/pkg）
-  const pkgDir = path.resolve(nmDir, packageName);
-  if (fs.existsSync(pkgDir)) {
-    protectedDirs.add(pkgDir);
-  }
-}
-
-if (protectedDirs.size > 0) {
-  const names = [...protectedDirs].map(d => path.relative(nmDir, d));
-  console.log(`[build-server] nft: protecting ${protectedDirs.size} server deps from pruning: ${names.join(", ")}`);
-}
-
-// 遍历 node_modules，删除未追踪的文件（跳过受保护的包）
-let removedFiles = 0;
-let removedSize = 0;
-
-function pruneDir(dir) {
-  let entries;
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
-
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (protectedDirs.has(path.resolve(full))) continue;
-      pruneDir(full);
-      // 删完子文件后如果目录空了，也删掉
-      try {
-        const remaining = fs.readdirSync(full);
-        if (remaining.length === 0) fs.rmdirSync(full);
-      } catch {}
-    } else if (entry.isFile() || entry.isSymbolicLink()) {
-      if (!tracedFiles.has(full)) {
-        const size = entry.isFile() ? (fs.statSync(full).size || 0) : 0;
-        fs.unlinkSync(full);
-        removedFiles++;
-        removedSize += size;
-      }
-    }
-  }
-}
-
-pruneDir(nmDir);
-
-const keptFiles = fileList.size;
-const MB = (n) => (n / 1024 / 1024).toFixed(0);
-console.log(`[build-server] nft: kept ${keptFiles} files, removed ${removedFiles} files (${MB(removedSize)}MB)`);
-} // end if (fileList)
 
 try {
   verifyExternalEntrypoints(outDir, Object.keys(externalPkg.dependencies));
