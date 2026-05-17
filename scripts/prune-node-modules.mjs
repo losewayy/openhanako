@@ -15,7 +15,7 @@ import fs from "fs";
 import path from "path";
 
 // Node.js 运行时只加载这四种类型
-const KEEP_EXTENSIONS = new Set([".js", ".cjs", ".mjs", ".json", ".node", ".wasm"]);
+const KEEP_EXTENSIONS = new Set([".js", ".cjs", ".mjs", ".json", ".node", ".wasm", ".css"]);
 
 // 永远保留的文件（精确匹配，无扩展名）
 const KEEP_BASENAMES = new Set([

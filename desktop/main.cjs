@@ -1122,6 +1122,13 @@ function createMainWindow() {
     mainWindow.webContents.openDevTools();
   }
 
+  // F12 切换 devtools（不论是否 --dev）
+  mainWindow.webContents.on("before-input-event", (_event, input) => {
+    if (input.key === "F12") {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
+
   // renderer 崩溃恢复：自动 reload
   mainWindow.webContents.on("render-process-gone", (_event, details) => {
     console.error(`[desktop] renderer 崩溃: ${details.reason} (code: ${details.exitCode})`);
