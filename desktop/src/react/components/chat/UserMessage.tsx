@@ -71,12 +71,12 @@ export const UserMessage = memo(function UserMessage({ message, showAvatar, sess
          data-message-id={message.id}>
       {showAvatar && !hideIdentity && (
         <div className={`${styles.avatarRow} ${styles.avatarRowUser}`}>
-          <span className={styles.avatarName}>{userName}</span>
           {isValidTimestamp(message.timestamp) && (
             <span className={`${styles.avatarTime} ${styles.avatarTimeUser}`}>
               {formatMessageTime(message.timestamp)}
             </span>
           )}
+          <span className={styles.avatarName}>{userName}</span>
           <AgentAvatar
             info={userDisplayInfo}
             className={`${styles.avatar} ${styles.userAvatar}`}
