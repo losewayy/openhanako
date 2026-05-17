@@ -201,6 +201,9 @@ export function handleAppEvent(type: string, data: any = {}): void {
     case 'chat-typography-changed':
       applyChatTypography({ chat: data.chat });
       break;
+    case 'network-proxy-changed':
+      window.platform?.settingsChanged?.('network-proxy-changed', data);
+      break;
     case 'paper-texture-changed':
       window.setPaperTexture(data.enabled);
       break;
