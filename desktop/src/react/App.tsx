@@ -80,7 +80,11 @@ function ConnectionStatus() {
 function App() {
   useSidebarResize();
   // 订阅 locale 变化，驱动整棵树重渲染
-  useStore(s => s.locale);
+  const locale = useStore(s => s.locale);
+
+  // i18n 未加载完成时不渲染 UI，防止 t('key') 返回键名本身
+  if (!locale) return null;
+
   const sidebarOpen = useStore(s => s.sidebarOpen);
   const jianOpen = useStore(s => s.jianOpen);
   const currentTab = useStore(s => s.currentTab);
