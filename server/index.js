@@ -61,6 +61,7 @@ import { createWebAuthRoute } from "./routes/web-auth.js";
 import { createMobileWorkbenchRoute } from "./routes/mobile-workbench.js";
 import { createMobileStaticRoute } from "./routes/mobile-static.js";
 import { createAccessRoute } from "./routes/access.js";
+import { createTokenUsageRoute, initTokenUsageStore } from "./routes/token-usage.js";
 import { configureProcessPiSdkEnv, ensureHanaPiSdkDirs, resolveHanakoHome } from "../shared/hana-runtime-paths.js";
 // internal-browser WS is handled directly via raw ws.WebSocketServer in the
 // upgrade handler below (WsTransport needs raw ws .on()/.off() methods)
@@ -463,6 +464,7 @@ app.route("/api", createConfigRoute(engine));
 app.route("/api", createUploadRoute(engine));
 app.route("/api", createProvidersRoute(engine));
 app.route("/api", createAvatarRoute(engine));
+app.route("/api", createTokenUsageRoute(initTokenUsageStore(hub, fromRoot("lib", "token-usage"))));
 app.route("/api", createAgentsRoute(engine));
 app.route("/api", createDevicesRoute(engine));
 app.route("/api", createCharacterCardsRoute(engine));
