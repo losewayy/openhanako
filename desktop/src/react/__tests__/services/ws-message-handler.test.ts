@@ -44,9 +44,11 @@ import { applyStreamingStatus, configureWsMessageHandler, handleServerMessage } 
 import { dispatchStreamKey } from '../../services/stream-key-dispatcher';
 import { handleAppEvent } from '../../services/app-event-actions';
 import { clearMessageLiveVersion, readMessageLiveVersion } from '../../stores/message-live-version';
+import { loadSessions } from '../../stores/session-actions';
 
 describe('ws-message-handler applyStreamingStatus', () => {
   beforeEach(() => {
+    vi.mocked(loadSessions).mockClear();
     useStore.setState({
       currentSessionPath: '/focused.jsonl',
       pendingNewSession: false,
@@ -130,6 +132,32 @@ describe('ws-message-handler session-scoped desktop events', () => {
     expect(first.data.text).toBe('hello from bridge');
     expect(first.data.quotedText).toBe('quote');
     expect(first.data.attachments).toEqual([{ path: '/tmp/a.png', name: 'a.png', isDir: false }]);
+  });
+
+  it('session_created 触发桌面端刷新 session 列表', () => {
+    handleServerMessage({
+      type: 'session_created',
+      sessionPath: '/session/new.jsonl',
+      session: {
+        path: '/session/new.jsonl',
+        title: '手机新会话',
+        firstMessage: 'from mobile',
+        modified: '2026-05-16T12:00:00.000Z',
+        messageCount: 1,
+        agentId: 'a1',
+        agentName: 'Hana',
+        cwd: '/workspace',
+      },
+    });
+
+    expect(useStore.getState().sessions[0]).toMatchObject({
+      path: '/session/new.jsonl',
+      title: '手机新会话',
+      firstMessage: 'from mobile',
+      messageCount: 1,
+      cwd: '/workspace',
+    });
+    expect(loadSessions).toHaveBeenCalledTimes(1);
   });
 
   it('stream replay 中的 session_user_message 若已由历史加载存在，不重复追加', () => {
@@ -365,6 +393,29 @@ describe('ws-message-handler background chat stream routing', () => {
     expect(streamBufferManager.handle).toHaveBeenCalledWith(msg);
     expect(dispatchStreamKey).toHaveBeenCalledWith('/session/b.jsonl', msg);
   });
+
+  it('远程端写入的用户消息会按 sessionPath 同步到桌面端后台会话缓存', () => {
+    handleServerMessage({
+      type: 'session_user_message',
+      sessionPath: '/session/b.jsonl',
+      message: {
+        id: 'mobile-u1',
+        text: '手机端发来的消息',
+        timestamp: '2026-05-16T00:00:00.000Z',
+      },
+    });
+
+    const items = useStore.getState().chatSessions['/session/b.jsonl']?.items || [];
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      type: 'message',
+      data: {
+        id: 'mobile-u1',
+        role: 'user',
+        text: '手机端发来的消息',
+      },
+    });
+  });
 });
 
 describe('ws-message-handler compaction lifecycle', () => {
@@ -464,10 +515,11 @@ describe('ws-message-handler app events', () => {
       event: {
         type: 'models-changed',
         payload: { reason: 'provider' },
+        source: 'server',
       },
     });
 
-    expect(handleAppEvent).toHaveBeenCalledWith('models-changed', { reason: 'provider' });
+    expect(handleAppEvent).toHaveBeenCalledWith('models-changed', { reason: 'provider' }, { source: 'server' });
   });
 });
 

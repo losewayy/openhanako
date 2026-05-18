@@ -25,7 +25,7 @@ export function hanaUrl(path: string): string {
  */
 export async function hanaFetch(
   path: string,
-  opts: RequestInit & { timeout?: number } = {},
+  opts: RequestInit & { timeout?: number; throwOnHttpError?: boolean } = {},
 ): Promise<Response> {
   const connection = requireServerConnection(
     useStore.getState(),
@@ -33,7 +33,12 @@ export async function hanaFetch(
   );
   const headers = appendConnectionAuth(connection, opts.headers);
 
-  const { timeout = DEFAULT_TIMEOUT, signal: callerSignal, ...fetchOpts } = opts;
+  const {
+    timeout = DEFAULT_TIMEOUT,
+    signal: callerSignal,
+    throwOnHttpError = true,
+    ...fetchOpts
+  } = opts;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   if (callerSignal) {
@@ -47,7 +52,7 @@ export async function hanaFetch(
       headers,
       signal: controller.signal,
     });
-    if (!res.ok) {
+    if (throwOnHttpError && !res.ok) {
       throw new Error(`hanaFetch ${path}: ${res.status} ${res.statusText}`);
     }
     return res;

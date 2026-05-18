@@ -214,6 +214,7 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
               sessionPath={previewSessionPath}
               agentId={previewAgentId}
               streamStatus={status}
+              summary={block.summary}
               scrollContainerRef={previewScrollRef}
             />
           ) : null}

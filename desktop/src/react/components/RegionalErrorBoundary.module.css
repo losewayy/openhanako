@@ -12,6 +12,10 @@
   animation: hana-shake 0.4s var(--ease-spring);
   margin-bottom: 12px;
 }
+.recovering {
+  min-height: 100px;
+  background: transparent;
+}
 .message {
   font-size: 13px;
   color: var(--text-secondary);
