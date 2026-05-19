@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSettingsStore } from '../store';
 import { t, VALID_THEMES, autoSaveConfig } from '../helpers';
 import { SelectWidget } from '@/ui';
@@ -12,14 +11,12 @@ import {
   mergeEditorTypography,
   normalizeEditorTypography,
   type EditorMarkdownTypography,
-  applyChatTypography,
-  mergeChatTypography,
-  normalizeChatTypography,
-  type ChatTypography,
 } from '../../editor/typography';
 import {
   isPaperTextureBlockedTheme,
+  isPaperTextureEnabled,
 } from '../../../shared/appearance-preferences';
+import { persistAppearancePreferences } from '../../services/appearance-sync';
 import styles from '../Settings.module.css';
 import registry from '../../../shared/theme-registry';
 
@@ -36,30 +33,26 @@ const THEME_MODE_KEYS: Record<string, string> = Object.fromEntries([
   [registry.AUTO_OPTION.id, registry.AUTO_OPTION.i18nMode],
 ]);
 
-const THEME_DESC_KEYS: Record<string, string | undefined> = Object.fromEntries(
-  Object.entries(registry.THEMES).map(([id, t]: [string, any]) => [id, t.i18nDescription]),
-);
+type MarkdownTypographyKey = keyof EditorMarkdownTypography;
 
-function getGroupedThemes(): Array<{ groupKey: string; themeIds: string[] }> {
-  const functional: string[] = [];
-  const personalized: string[] = [];
-
-  if (VALID_THEMES.includes('auto')) functional.push('auto');
-
-  for (const id of VALID_THEMES) {
-    if (id === 'auto') continue;
-    const entry = registry.THEMES[id as keyof typeof registry.THEMES];
-    if (entry?.group === 'functional') functional.push(id);
-    else personalized.push(id);
-  }
-
-  const groups: Array<{ groupKey: string; themeIds: string[] }> = [];
-  if (functional.length) groups.push({ groupKey: 'settings.appearance.groupFunctional', themeIds: functional });
-  if (personalized.length) groups.push({ groupKey: 'settings.appearance.groupPersonalized', themeIds: personalized });
-  return groups;
+interface AppearancePrefs {
+  currentTheme: string;
+  serifEnabled: boolean;
+  paperTextureEnabled: boolean;
+  paperTextureBlocked: boolean;
+  leavesOverlayEnabled: boolean;
 }
 
-type MarkdownTypographyKey = keyof EditorMarkdownTypography;
+function readAppearancePrefs(): AppearancePrefs {
+  const concreteTheme = document.documentElement.getAttribute('data-theme');
+  return {
+    currentTheme: registry.migrateSavedTheme(localStorage.getItem(registry.STORAGE_KEY)),
+    serifEnabled: localStorage.getItem('hana-font-serif') !== '0',
+    paperTextureEnabled: isPaperTextureEnabled(localStorage),
+    paperTextureBlocked: isPaperTextureBlockedTheme(concreteTheme),
+    leavesOverlayEnabled: localStorage.getItem('hana-leaves-overlay') === '1',
+  };
+}
 
 const EDITOR_FONT_SIZE_ROWS: Array<{
   key: MarkdownTypographyKey;
@@ -78,24 +71,28 @@ const EDITOR_FONT_SIZE_ROWS: Array<{
 ];
 
 export function InterfaceTab() {
-  const { settingsConfig, currentTheme, serifEnabled, paperTextureEnabled, leavesOverlayEnabled } = useSettingsStore(
-    useShallow(s => ({
-      settingsConfig: s.settingsConfig,
-      currentTheme: s.currentTheme,
-      serifEnabled: s.serifEnabled,
-      paperTextureEnabled: s.paperTextureEnabled,
-      leavesOverlayEnabled: s.leavesOverlayEnabled,
-    }))
-  );
-  const paperTextureBlocked = isPaperTextureBlockedTheme(document.documentElement.getAttribute('data-theme'));
+  const settingsConfig = useSettingsStore(s => s.settingsConfig);
+  const [appearancePrefs, setAppearancePrefs] = useState<AppearancePrefs>(() => readAppearancePrefs());
+  const refreshAppearancePrefs = useCallback(() => {
+    setAppearancePrefs(readAppearancePrefs());
+  }, []);
+  const syncAppearancePrefs = useCallback((patch: Record<string, unknown>) => {
+    persistAppearancePreferences(patch).catch((err) => {
+      console.warn('[settings] appearance sync failed:', err);
+    });
+  }, []);
+  const {
+    currentTheme,
+    serifEnabled,
+    paperTextureEnabled,
+    paperTextureBlocked,
+    leavesOverlayEnabled,
+  } = appearancePrefs;
   const editorTypography = useMemo(
     () => normalizeEditorTypography(settingsConfig?.editor),
     [settingsConfig?.editor],
   );
-  const chatTypography = useMemo(
-    () => normalizeChatTypography(settingsConfig),
-    [settingsConfig],
-  );
+  const hardwareAccelerationEnabled = settingsConfig?.hardware_acceleration !== false;
 
   const saveEditorTypography = async (patch: Partial<EditorMarkdownTypography>) => {
     const previousConfig = useSettingsStore.getState().settingsConfig || {};
@@ -117,24 +114,18 @@ export function InterfaceTab() {
     platform?.settingsChanged?.('editor-typography-changed', { editor: restored });
   };
 
-  const saveChatTypography = async (patch: Partial<ChatTypography>) => {
+  const saveHardwareAcceleration = async (next: boolean) => {
     const previousConfig = useSettingsStore.getState().settingsConfig || {};
-    const next = mergeChatTypography(previousConfig, { chat: patch });
-    const nextConfig = { ...previousConfig, chat: next.chat };
-    useSettingsStore.setState({ settingsConfig: nextConfig });
-    applyChatTypography(next);
-    platform?.settingsChanged?.('chat-typography-changed', { chat: next.chat });
+    useSettingsStore.setState({ settingsConfig: { ...previousConfig, hardware_acceleration: next } });
 
-    const saved = await autoSaveConfig({ chat: next.chat }, { silent: true });
+    const saved = await autoSaveConfig({ hardware_acceleration: next }, { silent: true });
     if (saved) {
+      platform?.settingsChanged?.('hardware-acceleration-changed', { hardware_acceleration: next });
       useSettingsStore.getState().showToast(t('settings.autoSaved'), 'success');
       return;
     }
 
-    const restored = normalizeChatTypography(previousConfig);
     useSettingsStore.setState({ settingsConfig: previousConfig });
-    applyChatTypography(restored);
-    platform?.settingsChanged?.('chat-typography-changed', { chat: restored.chat });
   };
 
   const locale = settingsConfig?.locale || 'zh-CN';
@@ -168,32 +159,24 @@ export function InterfaceTab() {
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="interface">
       <SettingsSection title={t('settings.appearance.theme')} variant="flush">
-        {getGroupedThemes().map(({ groupKey, themeIds }) => (
-          <div key={groupKey} className={styles['themeGroup']}>
-            <div className={styles['themeGroupTitle']}>{t(groupKey)}</div>
-            <div className={styles['theme-options']}>
-              {themeIds.map(theme => (
-                <button
-                  key={theme}
-                  className={`${styles['theme-card']}${currentTheme === theme ? ' ' + styles['active'] : ''}`}
-                  data-theme={theme}
-                  onClick={() => {
-                    setTheme?.(theme);
-                    localStorage.setItem(registry.STORAGE_KEY, theme);
-                    platform?.settingsChanged?.('theme-changed', { theme });
-                    useSettingsStore.setState({ currentTheme: theme });
-                  }}
-                >
-                  <div className={styles['theme-card-name']}>{t(THEME_NAME_KEYS[theme])}</div>
-                  <div className={styles['theme-card-mode']}>{t(THEME_MODE_KEYS[theme])}</div>
-                  {THEME_DESC_KEYS[theme] && (
-                    <div className={styles['theme-card-description']}>{t(THEME_DESC_KEYS[theme]!)}</div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className={styles['theme-options']}>
+          {VALID_THEMES.map(theme => (
+            <button
+              key={theme}
+              className={`${styles['theme-card']}${currentTheme === theme ? ' ' + styles['active'] : ''}`}
+              data-theme={theme}
+              onClick={() => {
+                window.setTheme?.(theme);
+                platform?.settingsChanged?.('theme-changed', { theme });
+                syncAppearancePrefs({ theme });
+                refreshAppearancePrefs();
+              }}
+            >
+              <div className={styles['theme-card-name']}>{t(THEME_NAME_KEYS[theme])}</div>
+              <div className={styles['theme-card-mode']}>{t(THEME_MODE_KEYS[theme])}</div>
+            </button>
+          ))}
+        </div>
       </SettingsSection>
 
       <SettingsSection title={t('settings.appearance.title')}>
@@ -204,9 +187,10 @@ export function InterfaceTab() {
             <Toggle
               on={serifEnabled}
               onChange={(next) => {
-                setSerifFont?.(next);
+                window.setSerifFont?.(next);
                 platform?.settingsChanged?.('font-changed', { serif: next });
-                useSettingsStore.setState({ serifEnabled: next });
+                syncAppearancePrefs({ serif: next });
+                refreshAppearancePrefs();
               }}
             />
           }
@@ -223,7 +207,8 @@ export function InterfaceTab() {
               onChange={(next) => {
                 window.setPaperTexture?.(next);
                 platform?.settingsChanged?.('paper-texture-changed', { enabled: next });
-                useSettingsStore.setState({ paperTextureEnabled: next });
+                syncAppearancePrefs({ paperTexture: next });
+                refreshAppearancePrefs();
               }}
             />
           }
@@ -240,8 +225,22 @@ export function InterfaceTab() {
                   detail: { type: 'leaves-overlay-changed', enabled: next },
                 }));
                 platform?.settingsChanged?.('leaves-overlay-changed', { enabled: next });
-                useSettingsStore.setState({ leavesOverlayEnabled: next });
+                syncAppearancePrefs({ leavesOverlay: next });
+                refreshAppearancePrefs();
               }}
+            />
+          }
+        />
+      </SettingsSection>
+
+      <SettingsSection title={t('settings.interface.system')}>
+        <SettingsRow
+          label={t('settings.interface.hardwareAcceleration')}
+          hint={t('settings.interface.hardwareAccelerationHint')}
+          control={
+            <Toggle
+              on={hardwareAccelerationEnabled}
+              onChange={saveHardwareAcceleration}
             />
           }
         />
@@ -288,51 +287,6 @@ export function InterfaceTab() {
               unit="px"
               min={0}
               max={64}
-            />
-          }
-        />
-      </SettingsSection>
-
-      <SettingsSection title={t('settings.chat.title')}>
-        <SettingsRow
-          label={t('settings.chat.chatMaxWidth')}
-          hint={t('settings.chat.chatMaxWidthHint')}
-          control={
-            <NumberInput
-              value={chatTypography.chat.chatMaxWidth}
-              onChange={(value) => saveChatTypography({ chatMaxWidth: value })}
-              unit="px"
-              min={400}
-              max={1200}
-            />
-          }
-        />
-        <SettingsRow
-          label={t('settings.chat.chatFontSize')}
-          hint={t('settings.chat.chatFontSizeHint')}
-          control={
-            <NumberInput
-              value={chatTypography.chat.chatFontSize}
-              onChange={(value) => saveChatTypography({ chatFontSize: value })}
-              unit="rem"
-              min={0.75}
-              max={1.3}
-              step={0.05}
-              precision="float"
-            />
-          }
-        />
-        <SettingsRow
-          label={t('settings.chat.chatLineHeight')}
-          hint={t('settings.chat.chatLineHeightHint')}
-          control={
-            <NumberInput
-              value={chatTypography.chat.chatLineHeight}
-              onChange={(value) => saveChatTypography({ chatLineHeight: value })}
-              min={1.2}
-              max={2.2}
-              step={0.05}
-              precision="float"
             />
           }
         />

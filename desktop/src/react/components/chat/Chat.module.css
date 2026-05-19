@@ -4,25 +4,13 @@
    文件输出卡片、浏览器截图、Xing 反省卡片
    ======================================== */
 
-@keyframes hana-chat-scroll-reveal {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
 /* ── 消息组 ── */
 
 .messageGroup {
     display: flex;
     flex-direction: column;
-    animation: hana-message-enter 0.3s var(--ease-out) both;
-}
-
-@supports (animation-timeline: view()) {
-    .messageGroup {
-        animation: hana-chat-scroll-reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 0% entry 15%;
-    }
+    --slide-y: 8px;
+    animation: hana-fade-up var(--duration-slow) var(--ease-out);
 }
 
 .messageGroup:first-child .avatarRow {
@@ -51,8 +39,7 @@
 }
 
 .avatarRowUser {
-    /* 不要 row-reverse，让 avatarName/avatarTime/Avatar 按 DOM 顺序从左到右排列。
-       avatarName + avatarTime 在左（外），Avatar 在右（内，贴近消息气泡）。 */
+    flex-direction: row-reverse;
 }
 
 .avatar {
@@ -83,18 +70,6 @@
     letter-spacing: 0.02em;
 }
 
-.avatarTime {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    letter-spacing: 0.01em;
-    margin-left: 0.25rem;
-}
-
-.avatarTimeUser {
-    margin-left: 0;
-    margin-right: 0.25rem;
-}
-
 /* 单条消息 */
 .message {
     max-width: 92%;
@@ -107,17 +82,115 @@
 
 /* 用户消息 */
 .messageUser {
-    background: var(--overlay-light);
-    padding: 10px 14px;
-    border-radius: 12px 12px 4px 12px;
+    background: rgba(0, 0, 0, 0.045);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-chat-card) var(--radius-chat-card) var(--radius-chat-card-inner) var(--radius-chat-card);
     color: var(--text);
-    font-size: var(--chat-font-size, 0.95rem);
-    font-weight: 350;
+    font-size: 0.95rem;
     word-break: break-word;
 }
 
 .messageUser .userText p:last-child {
     margin-bottom: 0;
+}
+
+.messageUserEditing {
+    width: min(520px, 78vw);
+    max-width: 92%;
+    padding: 0;
+    overflow: hidden;
+}
+
+.userEditTextarea {
+    display: block;
+    width: 100%;
+    min-height: 78px;
+    max-height: 240px;
+    resize: vertical;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    line-height: 1.65;
+    padding: var(--space-sm) var(--space-md);
+}
+
+.messageFooterActions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 20px;
+    margin-top: 2px;
+    color: var(--text-muted);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.messageFooterActionsRight {
+    justify-content: flex-end;
+    padding-right: 5px;
+}
+
+.messageFooterActionsLeft {
+    justify-content: flex-start;
+    padding-left: 5px;
+}
+
+.messageGroupUser:hover .messageFooterActions,
+.messageGroupAssistant:hover .messageFooterActions,
+.messageFooterActions:focus-within,
+.messageFooterActionsVisible {
+    opacity: 0.72;
+    pointer-events: auto;
+}
+
+.messageFooterActions:hover {
+    opacity: 1;
+}
+
+.messageFooterTime {
+    font-size: 0.64rem;
+    line-height: 1;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.messageFooterBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--duration-instant), background var(--duration-instant), opacity var(--duration-instant);
+}
+
+.messageFooterBtn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.messageFooterBtn:hover {
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.messageFooterBtn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.messageFooterBtnActive {
+    color: var(--accent);
+    background: transparent;
 }
 
 /* 用户附件 */
@@ -147,7 +220,7 @@
     max-height: 150px;
     background: var(--attach-bg, rgba(0, 0, 0, 0.04));
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     object-fit: contain;
 }
 
@@ -175,9 +248,8 @@
 /* 助手消息 */
 .messageAssistant {
     color: var(--hana-text);
-    font-size: var(--chat-font-size, 0.95rem);
-    line-height: var(--chat-line-height, 1.75);
-    font-weight: 350;
+    font-size: 0.95rem;
+    line-height: 1.75;
     word-break: break-word;
     position: relative;
 }
@@ -194,7 +266,7 @@
     bottom: 4px;
     right: 4px;
     opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast);
     z-index: 2;
 }
 
@@ -220,10 +292,10 @@
     border: 1px solid var(--hana-border);
     border-radius: 6px;
     padding: 2px 3px;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast);
 }
 
 .msgActions:hover .msgActionsPopover {
@@ -295,21 +367,6 @@
     .streamTailChar {
         animation: none;
     }
-    .messageGroup {
-        animation: none;
-    }
-    .typingIndicator {
-        animation: none;
-    }
-    .typingIndicatorDot {
-        animation: none;
-        opacity: 0.6;
-    }
-    .toolDots::after,
-    .thinkingBlockSummary .thinkingDots::after {
-        animation: none;
-        content: '...';
-    }
 }
 
 .msgActionBadge {
@@ -364,7 +421,7 @@
     display: inline-block;
     font-style: normal;
     font-size: 0.75rem;
-    transition: transform var(--duration-fast) var(--ease-out);
+    transition: transform var(--duration-fast) ease;
 }
 
 .moodArrowOpen {
@@ -391,7 +448,7 @@
     padding: var(--space-md);
     background: var(--bg-card, #fff);
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
     font-size: 0.82rem;
     width: fit-content;
     max-width: 360px;
@@ -429,7 +486,7 @@
     font-size: 0.75rem;
     font-family: inherit;
     cursor: pointer;
-    transition: opacity var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast);
 }
 
 .cronConfirmBtn:hover { opacity: 0.85; }
@@ -461,7 +518,7 @@
     padding: var(--space-lg) var(--space-lg) var(--space-md);
     background: var(--bg-card, #fff);
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-md), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
     font-size: 0.88rem;
     min-width: 320px;
     max-width: 420px;
@@ -571,7 +628,7 @@
     font-size: 0.82rem;
     font-family: inherit;
     cursor: pointer;
-    transition: opacity var(--duration-fast), box-shadow var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast), box-shadow var(--duration-fast);
 }
 
 .settingsConfirmBtn:hover { opacity: 0.9; }
@@ -579,17 +636,17 @@
 .settingsConfirmBtnConfirm {
     background: var(--accent);
     color: #fff;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .settingsConfirmBtnConfirm:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .settingsConfirmBtnReject {
     background: var(--overlay-medium);
     color: var(--text-light);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .settingsConfirmStatus {
@@ -697,7 +754,7 @@
 
 .toolDetailLink {
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast);
 }
 
 .toolDetailLink:hover {
@@ -782,7 +839,7 @@
     display: inline-block;
     font-style: normal;
     font-size: 0.75rem;
-    transition: transform var(--duration-fast) var(--ease-out);
+    transition: transform var(--duration-fast) ease;
 }
 
 .thinkingBlockArrowOpen {
@@ -804,7 +861,7 @@
 /* ── 文件输出卡片 ── */
 
 .fileOutputCard {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: var(--space-md);
     min-width: 300px;
@@ -814,9 +871,9 @@
     background: var(--bg-card, var(--bg));
     border: 1px solid var(--border, rgba(0,0,0,0.1));
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     overflow: hidden;
-    transition: background var(--duration-fast), border-color var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast), border-color var(--duration-fast);
 }
 
 .fileOutputPreviewable:hover {
@@ -913,10 +970,7 @@
     background: var(--bg-card, var(--bg));
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-chat-card);
-    box-shadow:
-      0 2px 4px rgba(0,0,0,0.04),
-      0 8px 16px rgba(0,0,0,0.08),
-      0 16px 32px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.07);
     animation: hana-fade-up var(--duration-fast) var(--ease-out);
 }
 
@@ -956,8 +1010,8 @@
     background: var(--bg-card, var(--bg));
     border: 0.5px solid var(--border, rgba(0,0,0,0.08));
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-sm);
-    transition: border-color var(--duration-fast) var(--ease-out);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: border-color var(--duration-fast);
 }
 
 .imageOutputCard:hover {
@@ -1022,7 +1076,7 @@
     border-radius: var(--radius-chat-card);
     max-width: 100%;
     cursor: pointer;
-    transition: background var(--duration-fast), box-shadow var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast), box-shadow var(--duration-fast);
 }
 
 .legacyArtifactCard:hover {
@@ -1082,7 +1136,7 @@
     border-radius: var(--radius-chat-card);
     border: 1px solid var(--border);
     cursor: pointer;
-    transition: opacity var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast);
 }
 
 .browserScreenshot img:hover {
@@ -1102,7 +1156,7 @@
     border-radius: var(--radius-chat-card);
     max-width: 100%;
     cursor: pointer;
-    transition: background var(--duration-fast), box-shadow var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast), box-shadow var(--duration-fast);
 }
 
 .skillCard:hover {
@@ -1137,7 +1191,7 @@
 
 .sessionPanel::-webkit-scrollbar-thumb {
     background: transparent;
-    transition: background-color var(--duration-slow) var(--ease-out);
+    transition: background var(--duration-slow) ease-out;
 }
 
 .sessionPanel:hover::-webkit-scrollbar-thumb,
@@ -1146,11 +1200,21 @@
 }
 
 .sessionMessages {
-    max-width: var(--chat-max-width, 800px);
+    max-width: var(--chat-column-width);
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+}
+
+:global(.mobile-desktop-root) .sessionPanel {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+}
+
+:global(.mobile-desktop-root) .messageUser,
+:global(.mobile-desktop-root) .messageAssistant {
+    font-size: 1rem;
 }
 
 .timelineNav {
@@ -1334,32 +1398,14 @@
     line-height: 0.6;
     letter-spacing: 0.08em;
     color: var(--accent);
-    animation: hana-message-enter 0.3s var(--ease-out) both;
+    --slide-y: 8px;
+    animation: hana-fade-up var(--duration-slow) var(--ease-out);
 }
 
 .typingIndicator::after {
     content: '';
     animation: hana-typewriter-dots 1.4s steps(1, end) infinite;
 }
-
-.typingIndicatorDots {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-    margin-left: 4px;
-}
-
-.typingIndicatorDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: hana-typing-dot-bounce 1.4s var(--ease-spring) infinite;
-}
-
-.typingIndicatorDot:nth-child(1) { animation-delay: 0ms; }
-.typingIndicatorDot:nth-child(2) { animation-delay: 160ms; }
-.typingIndicatorDot:nth-child(3) { animation-delay: 320ms; }
 
 /* ── Scroll to bottom FAB ── */
 
@@ -1374,26 +1420,19 @@
     border-radius: 50%;
     border: 1px solid var(--border-light, rgba(0,0,0,0.08));
     background: var(--bg-card, #fff);
-    box-shadow: var(--shadow-md), 0 0 0 1px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    transition:
-        opacity var(--duration-fast),
-        box-shadow var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast), box-shadow var(--duration-fast);
     opacity: 0.85;
 }
 
 .scrollToBottomFab:hover {
     opacity: 1;
-    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.06);
-}
-
-.scrollToBottomFab:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06);
 }
 
 .scrollToBottomFab svg {
@@ -1407,7 +1446,7 @@
     margin: var(--space-sm) 0;
     background: var(--bg-card, #fff);
     border-radius: var(--radius-chat-card);
-    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
     width: 420px;
     max-width: 90%;
     font-size: 0.82rem;
@@ -1417,11 +1456,11 @@
 .subagentCardHeader {
     display: flex;
     align-items: stretch;
-    transition: background var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast) ease;
 }
 
 .subagentCardHeader:hover {
-    background: var(--overlay-subtle);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .subagentCardButton {
@@ -1458,11 +1497,11 @@
 }
 
 .subagent-done .subagentStatus {
-    color: var(--success, #7a9e7a);
+    color: #7a9e7a;
 }
 
 .subagent-failed .subagentStatus {
-    color: var(--danger, #a67272);
+    color: #a67272;
 }
 
 .subagentAbortBtn {
@@ -1477,7 +1516,7 @@
     border-radius: 4px;
     flex-shrink: 0;
     opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
+    transition: opacity var(--duration-fast);
 }
 
 .subagentCardHeader:hover .subagentAbortBtn {
@@ -1485,7 +1524,7 @@
 }
 
 .subagentAbortBtn:hover {
-    color: var(--danger, #a67272);
+    color: #a67272;
     background: transparent;
 }
 
@@ -1545,7 +1584,7 @@
     padding: 0 12px 0;
     opacity: 0;
     transform: translateY(-6px);
-    transition: padding var(--duration-fast) cubic-bezier(0.33, 1, 0.68, 1), opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) cubic-bezier(0.33, 1, 0.68, 1);
+    transition: padding var(--duration-fast) cubic-bezier(0.33, 1, 0.68, 1), opacity 140ms ease, transform var(--duration-fast) cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .subagentPreviewWrapOpen .subagentPreviewScroll,
@@ -1598,58 +1637,4 @@
 
 .subagentIcon {
     margin-right: 4px;
-}
-
-/* ── 消息时间戳分隔符 ── */
-
-.timestampDivider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-sm) 0;
-    user-select: none;
-}
-
-.timestampDividerLabel {
-    font-size: var(--text-caption, 0.75rem);
-    color: var(--text-muted);
-    line-height: 1;
-}
-
-/* ── 新消息指示器 ── */
-
-.newMessageIndicator {
-    position: absolute;
-    bottom: 160px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 7;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 12px;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-    background: var(--bg-card);
-    color: var(--accent);
-    font-size: var(--text-caption, 0.75rem);
-    font-weight: 500;
-    box-shadow: var(--shadow-md);
-    cursor: pointer;
-    white-space: nowrap;
-    font-family: inherit;
-}
-
-.newMessageIndicator:hover {
-    background: color-mix(in srgb, var(--bg-card) 92%, var(--accent));
-    box-shadow: var(--shadow-lg);
-}
-
-.newMessageIndicator:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
-.newMessageIndicator svg {
-    flex-shrink: 0;
 }

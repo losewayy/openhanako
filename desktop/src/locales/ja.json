@@ -168,7 +168,8 @@
     "fileActions": {
       "more": "その他のファイル操作",
       "revealInFinder": "ファイルマネージャーで表示",
-      "copyPath": "ファイルパスをコピー"
+      "copyPath": "ファイルパスをコピー",
+      "downloadToDevice": "この端末にダウンロード"
     }
   },
   "time": {
@@ -612,10 +613,10 @@
       "mcp": "Connectors",
       "bridge": "ソーシャル",
       "sharing": "共有",
+      "access": "アクセスとデバイス",
       "plugins": "プラグイン",
       "about": "概要",
-      "security": "セキュリティ",
-      "tokenUsage": "使用量"
+      "security": "セキュリティ"
     },
     "computerUse": {
       "title": "Computer Use",
@@ -673,6 +674,11 @@
       "leavesOverlay": "晴れモード",
       "leavesOverlayHint": "たまには日向ぼっこしよう"
     },
+    "interface": {
+      "system": "システム",
+      "hardwareAcceleration": "ハードウェアアクセラレーション",
+      "hardwareAccelerationHint": "GPU でウィンドウを描画します。オフにすると次回起動からソフトウェア描画を使い、Windows の GPU ドライバー起因の起動クラッシュ復旧に役立ちます。"
+    },
     "editor": {
       "title": "エディター",
       "markdownBodyFontSize": "本文サイズ",
@@ -693,15 +699,6 @@
       "markdownLineHeightHint": "エディター内の行間を調整します。",
       "markdownContentPadding": "本文余白",
       "markdownContentPaddingHint": "エディター本文の左右余白を調整します。"
-    },
-    "chat": {
-      "title": "チャットエリア",
-      "chatMaxWidth": "メッセージ最大幅",
-      "chatMaxWidthHint": "チャットメッセージエリアの最大幅（px）。",
-      "chatFontSize": "フォントサイズ",
-      "chatFontSizeHint": "チャットメッセージのフォントサイズ（rem）。",
-      "chatLineHeight": "行の高さ",
-      "chatLineHeightHint": "チャットメッセージの行間を調整します。"
     },
     "locale": {
       "title": "言語と地域",
@@ -755,30 +752,12 @@
         "title": "ツール",
         "description": "ツールの切り替えは、会話を再開するか新しく始めた後に反映されます。進行中の会話は開始時のツールセットを使い続けます。",
         "items": {
-          "browser": {
-            "label": "ブラウザ",
-            "summary": "ヘッドレスブラウザを操作してウェブを閲覧"
-          },
-          "computer": {
-            "label": "Computer Use",
-            "summary": "承認済みのデスクトップアプリを操作し、動作カーソルを表示します"
-          },
-          "cron": {
-            "label": "定期実行",
-            "summary": "指定した時刻にタスクを自動実行"
-          },
-          "dm": {
-            "label": "ダイレクトメッセージ",
-            "summary": "別のエージェントに 1 対 1 のメッセージを送信"
-          },
-          "install_skill": {
-            "label": "スキルをインストール",
-            "summary": "GitHub またはスキルライブラリから新しいスキルをインストール"
-          },
-          "update_settings": {
-            "label": "設定を変更",
-            "summary": "Agent にアプリ設定の変更を許可"
-          }
+          "browser": { "label": "ブラウザ", "summary": "ヘッドレスブラウザを操作してウェブを閲覧" },
+          "computer": { "label": "Computer Use", "summary": "承認済みのデスクトップアプリを操作し、動作カーソルを表示します" },
+          "cron": { "label": "定期実行", "summary": "指定した時刻にタスクを自動実行" },
+          "dm": { "label": "ダイレクトメッセージ", "summary": "別のエージェントに 1 対 1 のメッセージを送信" },
+          "install_skill": { "label": "スキルをインストール", "summary": "GitHub またはスキルライブラリから新しいスキルをインストール" },
+          "update_settings": { "label": "設定を変更", "summary": "Agent にアプリ設定の変更を許可" }
         }
       },
       "computerUse": {
@@ -819,12 +798,85 @@
       "betaUpdates": "ベータ版アップデートを受け取る",
       "autoCheckUpdates": "アップデートを自動で確認"
     },
+    "access": {
+      "networkAccess": "LAN アクセス",
+      "mobileAccess": "モバイルアクセス",
+      "desktopAccess": "コンピューターアクセス",
+      "lanToggle": "LAN デバイスを許可",
+      "lanHint": "同じ LAN 上のスマートフォンやコンピューターからこの Hana Server にアクセスできます",
+      "port": "固定ポート",
+      "portHint": "ブックマークと QR コードに使います。変更後は Hana の再起動が必要です",
+      "mobileUrl": "モバイル URL",
+      "mobileUrlLanHint": "スマートフォンのブラウザーでこのアドレスを開きます",
+      "mobileUrlLocalHint": "現在はこのコンピューターだけが接続できます",
+      "status": "実行状態",
+      "statusHint": "サーバーの実際の待ち受け先と有効なモバイル URL を確認します",
+      "runtimeEndpoint": "現在の待ち受け",
+      "effectiveMobileUrl": "有効な URL",
+      "effectiveDesktopUrl": "コンピューター URL",
+      "lanAddresses": "LAN アドレス",
+      "noLanAddresses": "LAN アドレスが見つかりません",
+      "qrCode": "QR コード",
+      "qrCodeHint": "スキャンして PWA を開きます",
+      "restartRequired": "ポートの変更を保存しました。Hana を再起動すると反映されます",
+      "saveNetwork": "アクセス設定を保存",
+      "mobileKeys": "モバイルキー",
+      "generateMobileKey": "モバイルアクセスキーを生成",
+      "mobileKeyHint": "モバイルの初回ログインに使います。その後はブラウザーセッションに切り替わります",
+      "mobileKey": "アクセスキー",
+      "mobileKeyOnce": "キーは生成直後に一度だけ表示されます",
+      "mobileKeyCreated": "モバイルアクセスキーを生成しました",
+      "mobileKeyFailed": "生成に失敗しました",
+      "desktopUrl": "コンピューター URL",
+      "desktopUrlLanHint": "別の Hana デスクトップフロントエンドにこのアドレスを入力します",
+      "desktopUrlLocalHint": "LAN アクセスを有効にするまではこのコンピューターだけが接続できます",
+      "generateDesktopKey": "コンピューターアクセスキーを生成",
+      "desktopKeyHint": "別の Hana デスクトップフロントエンドから手動接続するときに使います",
+      "desktopKey": "コンピューターアクセスキー",
+      "desktopKeyOnce": "キーは生成直後に一度だけ表示されます",
+      "desktopKeyCreated": "コンピューターアクセスキーを生成しました",
+      "desktopKeyFailed": "生成に失敗しました",
+      "connectLanServer": "LAN サーバーに接続",
+      "remoteServerUrl": "サーバー URL",
+      "remoteServerUrlHint": "別のコンピューターまたは NAS の Hana Server URL を入力します",
+      "remoteServerKey": "アクセスキー",
+      "remoteServerKeyHint": "そのサーバーの設定ページで生成したコンピューターアクセスキーを入力します",
+      "remoteServerConnected": "LAN サーバーに接続しました",
+      "remoteServerFailed": "接続に失敗しました",
+      "pairedDevices": "ペアリング済みデバイス",
+      "noDevices": "ペアリング済みデバイスはありません",
+      "revoke": "取り消す",
+      "revokeCredential": "キーを取り消す",
+      "credentialRevoked": "キーを取り消しました",
+      "credentialRevokeFailed": "キーの取り消しに失敗しました",
+      "deviceRevoked": "デバイスを取り消しました",
+      "deviceRevokeFailed": "取り消しに失敗しました",
+      "localAccount": "ローカルアカウント",
+      "username": "ユーザー名",
+      "displayName": "表示名",
+      "saveAccount": "アカウントを保存",
+      "accountSaved": "アカウントを保存しました",
+      "password": "パスワード",
+      "passwordSet": "パスワード設定済み",
+      "passwordNotSet": "パスワード未設定",
+      "passwordHint": "今後の安全なリモートログイン用です。LAN HTTP ではモバイルアクセスキーを優先します",
+      "newPassword": "新しいパスワード",
+      "savePassword": "パスワードを保存",
+      "passwordSaved": "パスワードを保存しました",
+      "clearPassword": "パスワードを消去",
+      "passwordCleared": "パスワードを消去しました",
+      "copy": "コピー",
+      "copied": "コピーしました",
+      "saved": "保存しました",
+      "invalidPort": "ポートは数字で入力してください",
+      "loadFailed": "アクセス設定の読み込みに失敗しました"
+    },
     "security": {
       "sandbox": "サンドボックス",
-      "sandboxDesc": "AIのファイルシステムアクセスをワークスペースと必要なデータフォルダに制限します",
-      "sandboxWarning": "サンドボックスを無効にすると、AIがシステム上の任意のファイルにアクセスできるようになり、予期しない結果を招く可能性があります",
+      "sandboxDesc": "ファイルシステムへの書き込みを制限します。通常の外部ファイルは読み取り専用で、ワークスペース内は読み書きできます",
+      "sandboxWarning": "サンドボックスを無効にすると、AIがシステム上の任意のファイルを読み書き・削除できるようになり、予期しない結果を招く可能性があります",
       "sandboxNetwork": "サンドボックスのネットワークを許可",
-      "sandboxNetworkDesc": "有効にすると、ファイルシステム制限を維持したままサンドボックス内のコマンドが公開インターネットに接続できます",
+      "sandboxNetworkDesc": "有効にすると、ファイル書き込み制限を維持したままサンドボックス内のコマンドが公開インターネットに接続できます",
       "sandboxNetworkDisabledDesc": "サンドボックスが無効な間、コマンドは通常のローカルプロセスとして実行されます。この設定はサンドボックス内のコマンドだけに影響します",
       "networkProxy": "アウトバウンドプロキシ",
       "networkProxyMode": "プロキシモード",
@@ -957,6 +1009,7 @@
       "searchProviderField": "検索エンジン",
       "searchApiKey": "検索 API Key",
       "searchApiKeyHint": "選択した検索プロバイダーの API Key を入力してください",
+      "searchApiKeysAutoHint": "Auto は設定済みの Tavily、Brave、Serper を優先し、上限、エラー、空結果、関連度不足の場合はブラウザー検索へフォールバックします。",
       "searchApiKeyNotRequired": "ブラウザー検索に API Key は不要です。ローカルのバックグラウンドで検索ページを開き、結果を整形します。",
       "favorites": "お気に入り",
       "searchModel": "モデルを検索...",
@@ -1343,21 +1396,6 @@
         "上の入力欄に App ID と App Secret を貼り付けてスイッチをオンにします"
       ],
       "whatsappHint": "近日対応予定"
-    },
-    "tokenUsage": {
-      "title": "Token 使用量",
-      "totalCalls": "総呼び出し回数",
-      "promptTokens": "入力 Token",
-      "completionTokens": "出力 Token",
-      "totalTokens": "総消費",
-      "modelTrend": "モデル使用量推移",
-      "tokenTypeTrend": "Token タイプ推移",
-      "byModel": "モデル別",
-      "byDate": "日付別",
-      "date": "日付",
-      "model": "モデル",
-      "noData": "データなし",
-      "loadFailed": "読み込み失敗"
     }
   },
   "onboarding": {
@@ -1365,6 +1403,14 @@
       "title": "こんにちは、{name} です ✿",
       "subtitle": "あなた専用の AI アシスタントです。\n簡単なセットアップから始めましょう。",
       "next": "はじめる"
+    },
+    "remote": {
+      "link": "既存のサーバーがありますか？LAN で接続",
+      "url": "サーバー URL",
+      "key": "アクセスキー",
+      "connect": "接続",
+      "connecting": "接続中...",
+      "failed": "LAN サーバーへの接続に失敗しました"
     },
     "name": {
       "title": "なんとお呼びすればいいですか？",
@@ -1507,6 +1553,7 @@
         "preview": "プレビュー",
         "open": "開く",
         "reveal": "場所を表示",
+        "downloadToDevice": "この端末にダウンロード",
         "copyPath": "パスをコピー",
         "copySelectedPaths": "{n} 件のパスをコピー",
         "sendToBridge": "送信先...",
@@ -1556,6 +1603,7 @@
     "fileLabel": "ファイル",
     "openWithDefault": "デフォルトアプリで開く",
     "refresh": "再読み込み",
+    "newMarkdownFileName": "無題.md",
     "newFolder": "新しいフォルダ",
     "ctx": {
       "open": "開く",
@@ -1571,6 +1619,7 @@
     "deleteConfirm": "「{name}」をシステムのゴミ箱に移動しますか？",
     "deleteSelectedConfirm": "選択した {count} 件をシステムのゴミ箱に移動しますか？",
     "trashFailed": "システムのゴミ箱への移動に失敗しました",
+    "createFailed": "作成に失敗しました",
     "renameInvalid": "ファイル名にパス区切り文字は使えません",
     "renameFailed": "名前の変更に失敗しました",
     "sort": {
@@ -1772,8 +1821,7 @@
     "settingsApplyFailed": "設定変更に失敗しました: {msg}",
     "settingsCancelled": "ユーザーが「{label}」の変更をキャンセルしました",
     "settingsTimeout": "「{label}」の変更確認がタイムアウトしました。設定は変更されていません",
-    "subagentMaxConcurrent": "このセッションで {max} 個のサブエージェントが実行中です。完了をお待ちください。",
-    "subagentMaxGlobal": "システム全体で {max} 個のサブエージェントが実行中です。完了をお待ちください。",
+    "subagentMaxConcurrent": "現在 {max} 個のサブエージェントが実行中です。完了をお待ちください。",
     "subagentFailed": "サブエージェントの実行に失敗しました: {msg}",
     "subagentTimeout": "サブエージェントがタイムアウトしました（{minutes}分）",
     "subagentAborted": "サブエージェントが中止されました",
@@ -2208,8 +2256,10 @@
   "action.retry": "Retry",
   "subagentAbort": "停止",
   "subagentAborted": "停止済み",
+  "preview.toggle": "プレビューパネル",
   "preview.markdownPreview": "プレビュー",
   "preview.exitMarkdownPreview": "編集に戻る",
   "preview.openInNewWindow": "新しいウィンドウで表示",
-  "preview.openInNewWindowUnsupported": "このファイル形式は対応していません"
+  "preview.openInNewWindowUnsupported": "このファイル形式は対応していません",
+  "preview.markdownEditorStatus": "選択 {selected} 文字 · 合計 {total} 文字"
 }

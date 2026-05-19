@@ -46,6 +46,7 @@ import {
   resolveSessionSkillsForRuntime,
   snapshotSkillsForSession,
 } from "../lib/skills/session-skill-snapshot.js";
+import { SessionListProjectionCache } from "./session-list-projection-cache.js";
 
 const log = createModuleLogger("session");
 
@@ -332,6 +333,7 @@ export class SessionCoordinator {
     this._headlessOps = new Set();
     this._titlesCache = new Map(); // sessionDir → { titles, ts }
     this._metaCache = new Map();   // metaPath → { data, ts }
+    this._sessionListProjectionCache = deps.sessionListProjectionCache || new SessionListProjectionCache();
     this._pendingPermissionMode = null;
     this._runtimePermissionModeDefault = DEFAULT_SESSION_PERMISSION_MODE;
     this._metaWriteQueue = Promise.resolve();
@@ -375,6 +377,7 @@ export class SessionCoordinator {
     agentId: explicitAgentId = null,
     preserveAgentMemoryState = false,
     workspaceFolders = [],
+    visibleInSessionList = false,
   } = {}) {
     const t0 = Date.now();
     const agent = explicitAgent
@@ -510,6 +513,7 @@ export class SessionCoordinator {
       accessMode: initialAccessMode,
       planMode: initialPlanMode,
       thinkingLevel: initialThinkingLevel,
+      visibleInSessionList: visibleInSessionList === true && !restore,
     }; // pre-populated for resourceLoader proxy
 
     // 快照当前 system prompt，per-session 隔离。
@@ -1052,6 +1056,7 @@ export class SessionCoordinator {
       this._session = entry.session;
     }
     entry.lastTouchedAt = Date.now();
+    entry.visibleInSessionList = true;
     if (sessionPath === this.currentSessionPath) this._sessionStarted = true;
     const engine = this._d.getEngine?.();
     const abortController = new AbortController();
@@ -1919,7 +1924,8 @@ export class SessionCoordinator {
   }
 
   isSessionStreaming(sessionPath) {
-    return !!this.getSessionByPath(sessionPath)?.isStreaming;
+    return this._prePromptAbortControllers.has(sessionPath)
+      || !!this.getSessionByPath(sessionPath)?.isStreaming;
   }
 
   isSessionSwitching(sessionPath) {
@@ -1939,7 +1945,7 @@ export class SessionCoordinator {
       try { await fsp.access(sessionDir); } catch { return []; }
       try {
         const [sessions, titles, meta] = await Promise.all([
-          SessionManager.list(process.cwd(), sessionDir),
+          this._sessionListProjectionCache.list(sessionDir),
           this._loadSessionTitlesFor(sessionDir),
           this._readMetaCached(path.join(sessionDir, "session-meta.json")),
         ]);
@@ -1970,30 +1976,32 @@ export class SessionCoordinator {
     const allSessions = perAgent.flat();
 
     const currentPath = this.currentSessionPath;
-    const activeAgentId = this._d.getActiveAgentId();
-    // 只对"真正落在 agents/{id}/sessions/ 下但 SessionManager.list 暂未扫到"的
-    // 新 session 做占位——否则 subagent-sessions/、activity/、.ephemeral/ 等旁路
-    // 路径如果被意外塞进 this._session，会被伪造成"新对话"幻影条目。
-    if (
-      currentPath
-      && this._sessionStarted
-      && isActiveSessionPath(currentPath, this._d.agentsDir)
-      && !allSessions.find(s => s.path === currentPath)
-    ) {
-      const currentEntry = this._sessions.get(currentPath);
-      allSessions.unshift({
-        path: currentPath,
+    const projectedPaths = new Set(allSessions.map((s) => s.path));
+    for (const [sessionPath, entry] of this._sessions) {
+      if (projectedPaths.has(sessionPath)) continue;
+      if (!isActiveSessionPath(sessionPath, this._d.agentsDir)) continue;
+      const shouldExpose =
+        entry.visibleInSessionList === true
+        || entry.session?.isStreaming === true
+        || this._prePromptAbortControllers.has(sessionPath)
+        || (sessionPath === currentPath && this._sessionStarted);
+      if (!shouldExpose) continue;
+
+      const agent = this._d.getAgentById?.(entry.agentId) || this._d.getAgent();
+      allSessions.push({
+        path: sessionPath,
         title: null,
         firstMessage: "",
-        modified: new Date(),
+        modified: new Date(entry.lastTouchedAt || Date.now()),
         messageCount: 0,
-        cwd: this._session?.sessionManager?.getCwd?.() || "",
-        agentId: activeAgentId,
-        agentName: this._d.getAgent().agentName,
-        modelId: currentEntry?.modelId || null,
-        modelProvider: currentEntry?.modelProvider || null,
+        cwd: entry.session?.sessionManager?.getCwd?.() || "",
+        agentId: entry.agentId || this._d.getActiveAgentId(),
+        agentName: agent?.agentName || agent?.name || entry.agentId || null,
+        modelId: entry.modelId || null,
+        modelProvider: entry.modelProvider || null,
         pinnedAt: null,
       });
+      projectedPaths.add(sessionPath);
     }
 
     allSessions.sort((a, b) => b.modified - a.modified);
@@ -2334,12 +2342,19 @@ export class SessionCoordinator {
    *   onSessionReady (sessionPath => void) 回调，session 创建后、prompt 执行前触发
    */
   async executeIsolated(prompt, opts = {}) {
-    const targetAgent = opts.agentId ? this._d.getAgentById(opts.agentId) : this._d.getAgent();
+    let targetAgent = opts.agentId ? this._d.getAgentById(opts.agentId) : this._d.getAgent();
     if (!targetAgent) throw new Error(t("error.agentNotInitialized", { id: opts.agentId }));
 
     // abort signal：提前中止检查
     if (opts.signal?.aborted) {
       return { sessionPath: null, replyText: "", error: "aborted" };
+    }
+    if (typeof this._d.ensureAgentRuntime === "function") {
+      const ensured = await this._d.ensureAgentRuntime(targetAgent.id, {
+        priority: opts.agentId ? "background" : "foreground",
+        reason: "executeIsolated",
+      });
+      if (ensured) targetAgent = ensured;
     }
 
     const bm = BrowserManager.instance();

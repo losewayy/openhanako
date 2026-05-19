@@ -21,8 +21,17 @@ import { refreshPluginUI } from './stores/plugin-ui-actions';
 import { openSettingsModal } from './stores/settings-modal-actions';
 import { configureAppEventActions, handleAppEvent, readConfigCwdHistory, readConfigHomeFolder, readConfigMemoryMasterEnabled } from './services/app-event-actions';
 import { configureWsMessageHandler } from './services/ws-message-handler';
-import { applyEditorTypography, applyChatTypography } from './editor/typography';
-import { createLocalServerConnection, hasServerConnection, mergeServerIdentity } from './services/server-connection';
+import { applyEditorTypography } from './editor/typography';
+import {
+  LOCAL_CONNECTION_ID,
+  createLocalServerConnection,
+  hasServerConnection,
+  mergeServerIdentity,
+  readPersistedServerConnectionState,
+  upsertServerConnection,
+  type ServerConnection,
+} from './services/server-connection';
+import { persistAppearancePreferences } from './services/appearance-sync';
 // @ts-expect-error — shared JS module
 import { errorBus as _errorBus } from '../../../shared/error-bus.js';
 // @ts-expect-error — shared JS module
@@ -74,8 +83,22 @@ export async function initApp(): Promise<void> {
   // 1. 获取 server 连接信息并存入 Zustand
   const serverPort = await platform.getServerPort();
   const serverToken = await platform.getServerToken();
-  const activeServerConnection = createLocalServerConnection({ serverPort, serverToken });
-  useStore.setState({ serverPort, serverToken, activeServerConnection });
+  const localServerConnection = createLocalServerConnection({ serverPort, serverToken });
+  const persistedConnections = readPersistedServerConnectionState();
+  const initialRegistry = localServerConnection
+    ? upsertServerConnection(persistedConnections.serverConnections, localServerConnection)
+    : persistedConnections.serverConnections;
+  const requestedActiveConnection = persistedConnections.activeServerConnectionId
+    ? initialRegistry[persistedConnections.activeServerConnectionId]
+    : null;
+  const activeServerConnection = requestedActiveConnection || localServerConnection;
+  useStore.setState({
+    serverPort,
+    serverToken,
+    serverConnections: initialRegistry,
+    activeServerConnectionId: activeServerConnection?.connectionId ?? null,
+    activeServerConnection,
+  });
 
   if (!activeServerConnection) {
     setStatus('status.serverNotReady', false);
@@ -84,17 +107,45 @@ export async function initApp(): Promise<void> {
   }
 
   try {
-    const identityRes = await hanaFetch('/api/server/identity');
-    const identityData = await identityRes.json();
+    await refreshDeviceWebSession(activeServerConnection);
+    const mergedConnection = await loadIdentityForActiveConnection(activeServerConnection);
     useStore.setState({
-      activeServerConnection: mergeServerIdentity(activeServerConnection, identityData),
+      serverConnections: upsertServerConnection(useStore.getState().serverConnections, mergedConnection),
+      activeServerConnectionId: mergedConnection.connectionId,
+      activeServerConnection: mergedConnection,
     });
   } catch (err) {
-    console.error('[init] server identity failed:', err);
-    setStatus('status.serverNotReady', false);
-    platform.appReady();
-    return;
+    if (activeServerConnection.connectionId !== LOCAL_CONNECTION_ID && localServerConnection) {
+      console.warn('[init] remote server identity failed, returning to local server:', err);
+      useStore.setState({
+        activeServerConnectionId: localServerConnection.connectionId,
+        activeServerConnection: localServerConnection,
+      });
+      try {
+        await refreshDeviceWebSession(localServerConnection);
+        const mergedConnection = await loadIdentityForActiveConnection(localServerConnection);
+        useStore.setState({
+          serverConnections: upsertServerConnection(useStore.getState().serverConnections, mergedConnection),
+          activeServerConnectionId: mergedConnection.connectionId,
+          activeServerConnection: mergedConnection,
+        });
+      } catch (localErr) {
+        console.error('[init] server identity failed:', localErr);
+        setStatus('status.serverNotReady', false);
+        platform.appReady();
+        return;
+      }
+    } else {
+      console.error('[init] server identity failed:', err);
+      setStatus('status.serverNotReady', false);
+      platform.appReady();
+      return;
+    }
   }
+
+  persistAppearancePreferences().catch((err) => {
+    console.warn('[init] appearance preference sync skipped:', err);
+  });
 
   // 2. 并行获取 health + config
   try {
@@ -105,7 +156,6 @@ export async function initApp(): Promise<void> {
     const healthData = await healthRes.json();
     const configData = await configRes.json();
     applyEditorTypography(configData.editor);
-    applyChatTypography(configData);
 
     // 3. 加载 i18n
     await i18n.load(configData.locale || 'zh-CN');
@@ -184,7 +234,7 @@ export async function initApp(): Promise<void> {
 
   // 19. 设置变更监听
   platform.onSettingsChanged((type: string, data: any) => {
-    handleAppEvent(type, data);
+    handleAppEvent(type, data, { source: 'desktop-ipc' });
   });
 
   // 20. 主进程请求打开设置：托盘 / 外部 IPC 统一落到主窗口 modal
@@ -199,4 +249,20 @@ export async function initApp(): Promise<void> {
 
   // 22. 通知 app ready
   platform.appReady();
+}
+
+async function loadIdentityForActiveConnection(connection: ServerConnection): Promise<ServerConnection> {
+  const identityRes = await hanaFetch('/api/server/identity');
+  const identityData = await identityRes.json();
+  return mergeServerIdentity(connection, identityData);
+}
+
+async function refreshDeviceWebSession(connection: ServerConnection): Promise<void> {
+  if (connection.credentialKind !== 'device_credential' || !connection.token) return;
+  await hanaFetch('/api/web-auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ credential: connection.token }),
+  });
 }

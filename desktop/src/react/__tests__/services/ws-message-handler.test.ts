@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../hooks/use-stream-buffer', () => ({
   streamBufferManager: {
@@ -41,10 +41,16 @@ vi.mock('../../services/stream-key-dispatcher', () => ({
 import { streamBufferManager } from '../../hooks/use-stream-buffer';
 import { useStore } from '../../stores';
 import { applyStreamingStatus, configureWsMessageHandler, handleServerMessage } from '../../services/ws-message-handler';
+import { resetSessionRefreshSchedulerForTest } from '../../services/session-refresh-scheduler';
 import { dispatchStreamKey } from '../../services/stream-key-dispatcher';
 import { handleAppEvent } from '../../services/app-event-actions';
 import { clearMessageLiveVersion, readMessageLiveVersion } from '../../stores/message-live-version';
 import { loadSessions } from '../../stores/session-actions';
+
+afterEach(() => {
+  resetSessionRefreshSchedulerForTest();
+  vi.useRealTimers();
+});
 
 describe('ws-message-handler applyStreamingStatus', () => {
   beforeEach(() => {
@@ -134,7 +140,9 @@ describe('ws-message-handler session-scoped desktop events', () => {
     expect(first.data.attachments).toEqual([{ path: '/tmp/a.png', name: 'a.png', isDir: false }]);
   });
 
-  it('session_created 触发桌面端刷新 session 列表', () => {
+  it('session_created 乐观插入后延迟刷新 session 列表，避免同一波事件重复全量拉取', async () => {
+    vi.useFakeTimers();
+
     handleServerMessage({
       type: 'session_created',
       sessionPath: '/session/new.jsonl',
@@ -157,6 +165,9 @@ describe('ws-message-handler session-scoped desktop events', () => {
       messageCount: 1,
       cwd: '/workspace',
     });
+    expect(loadSessions).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(300);
     expect(loadSessions).toHaveBeenCalledTimes(1);
   });
 
@@ -554,5 +565,27 @@ describe('ws-message-handler turn_end side effects', () => {
     });
 
     expect(requestContextUsage).toHaveBeenCalledWith('/session/a.jsonl');
+  });
+
+  it('coalesces rapid turn_end session refreshes into one list request', async () => {
+    vi.useFakeTimers();
+    const requestContextUsage = vi.fn();
+    configureWsMessageHandler({ requestContextUsage });
+
+    handleServerMessage({
+      type: 'turn_end',
+      sessionPath: '/session/a.jsonl',
+    });
+    handleServerMessage({
+      type: 'turn_end',
+      sessionPath: '/session/a.jsonl',
+    });
+
+    expect(loadSessions).not.toHaveBeenCalled();
+    expect(requestContextUsage).toHaveBeenCalledTimes(2);
+
+    await vi.advanceTimersByTimeAsync(300);
+
+    expect(loadSessions).toHaveBeenCalledTimes(1);
   });
 });
