@@ -29,6 +29,7 @@ import { PluginsTab } from './tabs/PluginsTab';
 import { PluginMarketplaceTab } from './tabs/PluginMarketplaceTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { SharingTab } from './tabs/SharingTab';
+import { TokenUsageTab } from './tabs/token-usage';
 import { AccessTab } from './tabs/AccessTab';
 import { getNativeSettingsTabComponent } from './native-settings-tabs';
 import { CropOverlay } from './overlays/CropOverlay';
@@ -53,6 +54,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   providers: ProvidersTab,
   media: MediaTab,
   sharing: SharingTab,
+  'token-usage': TokenUsageTab,
   access: AccessTab,
   plugins: PluginsTab,
   'plugin-marketplace': PluginMarketplaceTab,

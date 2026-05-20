@@ -6325,6 +6325,218 @@ a.about-link:hover {
     transform: rotate(180deg);
 }
 
+/* ── Token Usage Tab ── */
+.tu-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: var(--space-lg);
+}
+.tu-toolbar-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.tu-date-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+}
+.tu-date-input:focus {
+    border-color: var(--accent);
+}
+.tu-date-sep {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+.tu-refresh-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+    padding: 0;
+}
+.tu-refresh-btn:hover:not(:disabled) {
+    color: var(--text);
+    border-color: var(--accent);
+}
+.tu-refresh-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* Summary Cards */
+.tu-summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+.tu-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 18px 10px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+.tu-card:last-child {
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-card));
+    border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.tu-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+}
+.tu-card:last-child .tu-card-value {
+    color: var(--accent);
+}
+.tu-card-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+}
+
+/* Charts Row */
+.tu-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+.tu-chart-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px 12px 12px;
+    box-shadow: var(--shadow-sm);
+}
+.tu-chart-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.2px;
+}
+
+/* Tables */
+.tu-tables {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.tu-table-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+.tu-table-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid var(--overlay-light);
+    letter-spacing: 0.2px;
+}
+.tu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.tu-th {
+    padding: 8px 14px;
+    text-align: right;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.3px;
+}
+.tu-th:first-child,
+.tu-td:first-child {
+    text-align: left;
+}
+.tu-th-sortable {
+    padding: 8px 14px;
+    text-align: right;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.7rem;
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+.tu-th-sortable:first-child {
+    text-align: left;
+}
+.tu-th-sortable:hover {
+    color: var(--text);
+}
+.tu-td {
+    padding: 7px 14px;
+    text-align: right;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    border-top: 1px solid var(--overlay-subtle);
+}
+.tu-table tbody tr:hover {
+    background: var(--overlay-subtle);
+}
+.tu-sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--text-muted);
+    vertical-align: middle;
+}
+.tu-sort-icon[data-active="1"] {
+    color: var(--accent);
+}
+
+/* States */
+.tu-loading,
+.tu-empty-main {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.tu-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 0;
+    color: var(--danger);
+    font-size: 0.85rem;
+}
+.tu-retry-btn {
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font-size: 0.78rem;
+    padding: 4px 12px;
+    cursor: pointer;
+}
+
 /* ============================================================
    Overlay 防 titlebar drag 吞点击
    ------------------------------------------------------------

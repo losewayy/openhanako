@@ -63,25 +63,26 @@ function ConnectionStatus() {
 
 function App() {
   useSidebarResize();
-  // 订阅 locale 变化，驱动整棵树重渲染
+  // 所有 hooks 必须无条件执行，不能放在 early return 之后
   const locale = useStore(s => s.locale);
-
-  // i18n 未加载完成时不渲染 UI，防止 t('key') 返回键名本身
-  if (!locale) return null;
-
   const sidebarOpen = useStore(s => s.sidebarOpen);
   const jianOpen = useStore(s => s.jianOpen);
   const previewOpen = useStore(s => s.previewOpen);
   const currentTab = useStore(s => s.currentTab);
-  const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
   const { floatCard, show: showFloat, scheduleHide: scheduleFloatHide, cancelHide: cancelFloatHide, hide: hideFloat } = useFloatCard();
 
+  // initApp 必须无条件调用，不能放在 hooks 之后
   useEffect(() => {
     initApp().catch((err: unknown) => {
       console.error('[init] 初始化异常:', err);
       window.platform?.appReady?.();
     });
   }, []);
+
+  // i18n 未加载完成时不渲染 UI，防止 t('key') 返回键名本身
+  if (!locale) return null;
+
+  const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
 
   return (
     <ErrorBoundary>

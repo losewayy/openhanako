@@ -1,6 +1,9 @@
 import { memo } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
 import styles from './Chat.module.css';
+import { formatMessageTime, isValidTimestamp } from './timeline-anchors';
+
+export { formatMessageTime, isValidTimestamp };
 
 export interface MessageFooterAction {
   id: string;
@@ -52,11 +55,3 @@ export const MessageFooterActions = memo(function MessageFooterActions({
     </div>
   );
 });
-
-export function formatMessageTime(timestamp?: number): string | null {
-  if (!timestamp || !Number.isFinite(timestamp)) return null;
-  const date = new Date(timestamp);
-  const hh = String(date.getHours()).padStart(2, '0');
-  const mm = String(date.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
-}

@@ -8,6 +8,7 @@
 import { Hono } from "hono";
 import fs from "fs";
 import path from "path";
+import { normalizeLlmUsage } from "../../lib/llm/usage-observer.js";
 
 const STORE_FILE = "token-usage.json";
 
@@ -67,7 +68,7 @@ export class TokenUsageStore {
     }
   }
 
-  record({ date, provider_id, model, prompt_tokens = 0, completion_tokens = 0, call_count = 1 }) {
+  record({ date, provider_id, model, prompt_tokens = 0, completion_tokens = 0, cache_tokens = 0, cost = null, call_count = 1 }) {
     if (!date || !model) return;
 
     if (!this.#data[date]) this.#data[date] = {};
@@ -79,6 +80,8 @@ export class TokenUsageStore {
         model,
         prompt_tokens: 0,
         completion_tokens: 0,
+        cache_tokens: 0,
+        cost: null,
         call_count: 0,
       };
     }
@@ -86,6 +89,10 @@ export class TokenUsageStore {
     const entry = this.#data[date][key];
     entry.prompt_tokens += prompt_tokens;
     entry.completion_tokens += completion_tokens;
+    entry.cache_tokens = (entry.cache_tokens || 0) + cache_tokens;
+    if (cost !== null && cost !== undefined) {
+      entry.cost = (entry.cost || 0) + cost;
+    }
     entry.call_count += call_count;
 
     this.#schedulePersist();
@@ -106,6 +113,8 @@ export class TokenUsageStore {
           model: entry.model,
           prompt_tokens: entry.prompt_tokens,
           completion_tokens: entry.completion_tokens,
+          cache_tokens: entry.cache_tokens || 0,
+          cost: entry.cost ?? null,
           call_count: entry.call_count,
         });
       }
@@ -161,28 +170,21 @@ export function initTokenUsageStore(hub, persistDir) {
     const { usage, modelId, modelProvider } = event;
     if (!usage || !modelId) return;
 
-    const prompt_tokens = firstNum(usage, "inputTokens", "input_tokens", "prompt_tokens", "input");
-    const completion_tokens = firstNum(usage, "outputTokens", "output_tokens", "completion_tokens", "output");
-
-    if (prompt_tokens === 0 && completion_tokens === 0) return;
+    const normalized = normalizeLlmUsage(usage, { costRates: null });
+    if (!normalized) return;
+    if (normalized.inputTokens === 0 && normalized.outputTokens === 0) return;
 
     store.record({
       date: todayStr(),
       provider_id: modelProvider || "",
       model: modelId,
-      prompt_tokens,
-      completion_tokens,
+      prompt_tokens: normalized.inputTokens,
+      completion_tokens: normalized.outputTokens,
+      cache_tokens: (normalized.cacheReadTokens || 0) + (normalized.cacheWriteTokens || 0),
+      cost: normalized.costTotal ?? null,
       call_count: 1,
     });
   });
 
   return store;
-}
-
-function firstNum(obj, ...keys) {
-  for (const k of keys) {
-    const v = obj?.[k];
-    if (typeof v === "number" && Number.isFinite(v)) return Math.round(v);
-  }
-  return 0;
 }

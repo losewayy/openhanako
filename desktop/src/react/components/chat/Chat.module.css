@@ -151,6 +151,13 @@
     opacity: 1;
 }
 
+.avatarTime {
+    font-size: 0.64rem;
+    line-height: 1;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
 .messageFooterTime {
     font-size: 0.64rem;
     line-height: 1;
@@ -1426,13 +1433,17 @@
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    transition: opacity var(--duration-fast), box-shadow var(--duration-fast);
     opacity: 0.85;
 }
 
 .scrollToBottomFab:hover {
-    opacity: 1;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06);
+    opacity: 0.85;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+.scrollToBottomFab:active {
+    opacity: 0.85;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04);
 }
 
 .scrollToBottomFab svg {

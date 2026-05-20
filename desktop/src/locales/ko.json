@@ -616,7 +616,8 @@
       "access": "접근 및 기기",
       "plugins": "플러그인",
       "about": "소개",
-      "security": "보안"
+      "security": "보안",
+      "tokenUsage": "사용량"
     },
     "computerUse": {
       "title": "Computer Use",
@@ -752,12 +753,30 @@
         "title": "도구",
         "description": "도구 스위치는 대화를 다시 시작하거나 새 대화를 시작한 뒤 적용돼요. 진행 중인 대화는 시작할 때의 도구 집합을 계속 사용해요.",
         "items": {
-          "browser": { "label": "브라우저", "summary": "헤드리스 브라우저로 웹 페이지를 탐색" },
-          "computer": { "label": "Computer Use", "summary": "승인된 데스크톱 앱을 제어하고 실시간 동작 커서를 표시합니다" },
-          "cron": { "label": "예약 작업", "summary": "지정한 시간에 작업을 자동 실행" },
-          "dm": { "label": "다이렉트 메시지", "summary": "다른 에이전트에게 1대1 메시지 전송" },
-          "install_skill": { "label": "스킬 설치", "summary": "GitHub 또는 스킬 라이브러리에서 새 스킬 설치" },
-          "update_settings": { "label": "설정 변경", "summary": "Agent가 앱 설정을 수정할 수 있도록 허용" }
+          "browser": {
+            "label": "브라우저",
+            "summary": "헤드리스 브라우저로 웹 페이지를 탐색"
+          },
+          "computer": {
+            "label": "Computer Use",
+            "summary": "승인된 데스크톱 앱을 제어하고 실시간 동작 커서를 표시합니다"
+          },
+          "cron": {
+            "label": "예약 작업",
+            "summary": "지정한 시간에 작업을 자동 실행"
+          },
+          "dm": {
+            "label": "다이렉트 메시지",
+            "summary": "다른 에이전트에게 1대1 메시지 전송"
+          },
+          "install_skill": {
+            "label": "스킬 설치",
+            "summary": "GitHub 또는 스킬 라이브러리에서 새 스킬 설치"
+          },
+          "update_settings": {
+            "label": "설정 변경",
+            "summary": "Agent가 앱 설정을 수정할 수 있도록 허용"
+          }
         }
       },
       "computerUse": {

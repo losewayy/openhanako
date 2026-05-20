@@ -4,7 +4,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MarkdownContent } from './MarkdownContent';
-import { MessageFooterActions, formatMessageTime, type MessageFooterAction } from './MessageFooterActions';
+import { MessageFooterActions, formatMessageTime, isValidTimestamp, type MessageFooterAction } from './MessageFooterActions';
 import { AttachmentChip } from '../shared/AttachmentChip';
 import type { ChatMessage, UserAttachment, DeskContext } from '../../stores/chat-types';
 import { useStore } from '../../stores';
@@ -169,6 +169,11 @@ export const UserMessage = memo(function UserMessage({
       {showAvatar && !hideIdentity && (
         <div className={`${styles.avatarRow} ${styles.avatarRowUser}`}>
           <span className={styles.avatarName}>{userName}</span>
+          {isValidTimestamp(message.timestamp) && (
+            <span className={styles.avatarTime}>
+              {formatMessageTime(message.timestamp)}
+            </span>
+          )}
           <AgentAvatar
             info={userDisplayInfo}
             className={`${styles.avatar} ${styles.userAvatar}`}

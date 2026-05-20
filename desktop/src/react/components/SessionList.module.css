@@ -159,8 +159,7 @@ section:first-child > .sessionSectionTitle + * {
 /* 重命名按钮 */
 .sessionPinBtn {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 6px;
     right: 52px;
     display: flex;
     align-items: center;
@@ -193,9 +192,8 @@ section:first-child > .sessionSectionTitle + * {
 
 .sessionRenameBtn {
     position: absolute;
-    top: 50%;
+    bottom: 6px;
     right: 24px;
-    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;

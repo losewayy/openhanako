@@ -619,7 +619,8 @@
       "access": "Access & Devices",
       "plugins": "Plugins",
       "about": "About",
-      "security": "Security"
+      "security": "Security",
+      "tokenUsage": "Usage"
     },
     "appearance": {
       "title": "Appearance",
@@ -757,12 +758,30 @@
         "title": "Tools",
         "description": "Tool switches take effect after restarting or starting a conversation. Active conversations keep using the tool set they started with.",
         "items": {
-          "browser": { "label": "Browser", "summary": "Control a headless browser to navigate web pages" },
-          "computer": { "label": "Computer Use", "summary": "Control approved desktop apps with a visible action overlay" },
-          "cron": { "label": "Scheduled Tasks", "summary": "Run tasks automatically at specified times" },
-          "dm": { "label": "Direct Message", "summary": "Send a one-on-one message to another agent" },
-          "install_skill": { "label": "Install Skill", "summary": "Install new skills from GitHub or the skill library" },
-          "update_settings": { "label": "Update Settings", "summary": "Allow the agent to modify application configuration" }
+          "browser": {
+            "label": "Browser",
+            "summary": "Control a headless browser to navigate web pages"
+          },
+          "computer": {
+            "label": "Computer Use",
+            "summary": "Control approved desktop apps with a visible action overlay"
+          },
+          "cron": {
+            "label": "Scheduled Tasks",
+            "summary": "Run tasks automatically at specified times"
+          },
+          "dm": {
+            "label": "Direct Message",
+            "summary": "Send a one-on-one message to another agent"
+          },
+          "install_skill": {
+            "label": "Install Skill",
+            "summary": "Install new skills from GitHub or the skill library"
+          },
+          "update_settings": {
+            "label": "Update Settings",
+            "summary": "Allow the agent to modify application configuration"
+          }
         }
       },
       "computerUse": {
