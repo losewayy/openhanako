@@ -682,7 +682,7 @@ export function createChatRoute(engine, hub, { upgradeWebSocket }) {
       try {
         const sess = engine.getSessionByPath(sessionPath);
         if (sess) {
-          const usage = getLastAssistantUsage(sess.entries ?? []);
+          const usage = getLastAssistantUsage(sess.sessionManager?.getEntries() ?? []);
           if (usage) {
             const model = sess.model;
             logLlmUsage({

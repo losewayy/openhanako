@@ -2468,34 +2468,16 @@ html[data-platform="linux"] .tb-toggle-right {
     opacity: 0.35;
 }
 
-/* 右 jian sidebar：鼠标跟随渐变线，上下渐变消失避开圆角 */
-.resize-handle-left { left: -4px; }
-.resize-handle-left::after {
-    content: "";
-    position: absolute;
-    top: 48px;
-    bottom: 0;
-    left: 50%;
-    width: 2.5px;
-    margin-left: -1.25px;
-    background: radial-gradient(
-        ellipse 2.5px 100px at center calc(var(--handle-y, -999px) - 48px),
-        var(--accent) 0%,
-        transparent 100%
-    );
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
-    pointer-events: none;
-    -webkit-mask-image: linear-gradient(to bottom,
-        transparent 0%, transparent 15%, black 25%, black 75%, transparent 85%, transparent 100%
-    );
-    mask-image: linear-gradient(to bottom,
-        transparent 0%, transparent 15%, black 25%, black 75%, transparent 85%, transparent 100%
-    );
+/* 右 jian sidebar：整条高亮线，与左 sidebar 对称 */
+.resize-handle-left {
+    left: -4px;
+    width: 6px;
+    transition: background var(--duration-fast) var(--ease-out);
 }
-.resize-handle-left:hover::after,
-.resize-handle-left.active::after {
-    opacity: 1;
+.resize-handle-left:hover,
+.resize-handle-left.active {
+    background: var(--accent);
+    opacity: 0.35;
 }
 
 /* 拖拽中禁止文字选中 */

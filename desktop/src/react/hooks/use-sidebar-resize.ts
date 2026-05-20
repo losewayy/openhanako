@@ -33,6 +33,7 @@ export function useSidebarResize(): void {
     function applySidebarWidth(w: number): void {
       const px = w + 'px';
       root.style.setProperty('--sidebar-width', px);
+      if (sidebarEl) { sidebarEl.style.width = px; sidebarEl.style.minWidth = px; }
       if (leftInner) { leftInner.style.width = px; leftInner.style.minWidth = px; }
     }
 
@@ -44,6 +45,7 @@ export function useSidebarResize(): void {
     function applyJianWidth(w: number): void {
       const px = w + 'px';
       root.style.setProperty('--jian-sidebar-width', px);
+      if (jianSidebarEl) { jianSidebarEl.style.width = px; jianSidebarEl.style.minWidth = px; }
       if (rightInner) { rightInner.style.width = px; rightInner.style.minWidth = px; }
       updateJianColumns(w);
     }
@@ -116,6 +118,7 @@ export function useSidebarResize(): void {
           rafIdRef.current = requestAnimationFrame(() => {
             const delta = isRight ? startX - e.clientX : e.clientX - startX;
             const w = Math.max(min, Math.min(max, startW + delta));
+            console.log('[resize]', { startX, clientX: e.clientX, delta, startW, w, storageKey });
             liveWidth = w;
             setWidth(w);
             const rect = handle!.getBoundingClientRect();
