@@ -289,8 +289,10 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isStreamin
         onContextMenu={handleContextMenu}
       >
         <div className={styles.sessionItemHeader}>
-          {s.agentId && (
+          {s.agentId ? (
             <AgentBadge agentId={s.agentId} agentName={s.agentName} agents={agents} />
+          ) : (
+            <span className={styles.agentBadgePlaceholder} />
           )}
           {isStreaming && <span className={styles.sessionStreamingDot} />}
           {editing ? (

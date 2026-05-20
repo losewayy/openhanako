@@ -74,14 +74,18 @@
 
 /* 工作台标题行 */
 .header {
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-xs) var(--space-sm);
+    position: static;
 }
 
 .headerCwdBtn {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
+    position: static;
+    transform: none;
+    z-index: 0;
+    flex-shrink: 0;
 }
 
 /* 打开文件夹按钮 */

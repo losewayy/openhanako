@@ -28,8 +28,9 @@
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     min-height: 40px;
-    padding: 6px calc(var(--space-sm) + 7.5rem) 2px var(--space-md);
+    padding: 6px var(--space-md) 2px var(--space-md);
 }
 
 .workspaceTitle {
