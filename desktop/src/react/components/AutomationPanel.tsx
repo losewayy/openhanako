@@ -15,6 +15,7 @@ interface CronJob {
   prompt?: string;
   schedule: string | number;
   model?: string | ModelRef;
+  actorAgentId?: string;
 }
 
 interface ModelRef {
@@ -220,7 +221,7 @@ function AutomationItem({
   }, [editValue, labelText, job.id, onUpdate]);
 
   const displayInfo = resolveAgentDisplayInfo({
-    id: currentAgentId,
+    id: job.actorAgentId || currentAgentId,
     agents,
     fallbackAgentName: agentName,
     fallbackAgentYuan: agentYuan,
