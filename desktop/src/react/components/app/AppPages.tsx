@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useRef, useEffect } from 'react';
+import type { TabType } from '../../types';
 import { useStore } from '../../stores';
 import { ActivityPanel } from '../ActivityPanel';
 import { AutomationPanel } from '../AutomationPanel';

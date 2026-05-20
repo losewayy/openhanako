@@ -711,8 +711,8 @@ html[data-platform="linux"] .tb-toggle-right {
     background-color: var(--sidebar-bg, var(--bg));
     border-right: none;
     padding-top: 40px; /* 给 titlebar 留空间 */
-    overflow: hidden;
-    contain: layout style;
+    overflow: clip;
+    contain: style;
     transition: width var(--duration-slow) var(--ease-out),
                 border-color var(--duration-slow) var(--ease-out);
     z-index: 10;
@@ -2417,8 +2417,8 @@ html[data-platform="linux"] .tb-toggle-right {
     display: flex;
     flex-direction: column;
     padding-top: 40px;
-    overflow: hidden;
-    contain: layout style;
+    overflow: clip;
+    contain: style;
     transition: width var(--duration-slow) var(--ease-out);
     z-index: 10;
 }

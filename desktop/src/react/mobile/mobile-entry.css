@@ -302,7 +302,7 @@ html[data-platform="linux"] .tb-toggle-right {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: clip;
     padding-top: 40px;
     background-color: var(--sidebar-bg, var(--bg));
     border-right: 1px solid var(--overlay-light);
@@ -773,7 +773,7 @@ html[data-platform="linux"] .tb-toggle-right {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: clip;
     padding-top: 40px;
     z-index: 10;
     transition: width var(--duration-slow) var(--ease-out);
