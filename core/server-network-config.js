@@ -5,7 +5,7 @@ import { atomicWriteSync } from "../shared/safe-fs.js";
 export const SERVER_NETWORK_FILE = "server-network.json";
 
 const SCHEMA_VERSION = 1;
-export const DEFAULT_SERVER_LISTEN_PORT = 14500;
+export const DEFAULT_SERVER_LISTEN_PORT = 14501;
 const MODES = ["loopback", "lan", "custom_remote"];
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]);
 const MIN_USER_PORT = 1024;
