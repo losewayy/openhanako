@@ -1024,7 +1024,7 @@ export class HanaEngine {
   //  生命周期
   // ════════════════════════════
 
-  async init(log = () => {}) {
+  async init(log = createModuleLogger("engine")) {
     const startupTimer = Date.now();
 
     // 0. Config scope 迁移（全局字段从 agent config → preferences）
@@ -1079,7 +1079,7 @@ export class HanaEngine {
 
     // 2. 初始化所有 agent
     log(`[init] 2/5 初始化所有 agent...`);
-    await this._agentMgr.initAllAgents(log, this._agentMgr.activeAgentId);
+    await this._agentMgr.initAllAgents({ log, startId: this._agentMgr.activeAgentId });
     log(`[init] 2/5 ${this._agentMgr.agents.size} 个 agent 已就绪`);
 
     // 2b. 确保所有 agent 都有 channels.md（老用户升级兼容）

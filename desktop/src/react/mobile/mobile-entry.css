@@ -302,7 +302,6 @@ html[data-platform="linux"] .tb-toggle-right {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    overflow: clip;
     padding-top: 40px;
     background-color: var(--sidebar-bg, var(--bg));
     border-right: 1px solid var(--overlay-light);
@@ -321,6 +320,7 @@ html[data-platform="linux"] .tb-toggle-right {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
     height: 100%;
+    overflow: clip;
     opacity: 1;
     transition: opacity var(--duration-fast) var(--ease-out);
 }
@@ -773,7 +773,6 @@ html[data-platform="linux"] .tb-toggle-right {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    overflow: clip;
     padding-top: 40px;
     z-index: 10;
     transition: width var(--duration-slow) var(--ease-out);
@@ -789,7 +788,7 @@ html[data-platform="linux"] .tb-toggle-right {
     width: var(--jian-sidebar-width);
     min-width: var(--jian-sidebar-width);
     height: 100%;
-    overflow: hidden;
+    overflow: clip;
     padding: 10px 7px 7px 0;
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.06);
 }

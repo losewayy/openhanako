@@ -39,7 +39,8 @@
     font-size: 0.78rem;
     font-weight: 500;
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast) var(--ease-out),
+                transform 0.1s cubic-bezier(0.2, 0, 0, 1);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -48,6 +49,10 @@
 
 .tbTab:hover {
     color: var(--text-light);
+}
+
+.tbTab:active {
+    transform: scale(0.95);
 }
 
 .tbTabActive {
@@ -100,9 +105,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    background: color-mix(in srgb, var(--glass-bg, var(--bg)) 20%, transparent);
     z-index: 5;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(var(--glass-blur-sm, 4px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm, 4px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
 }
 
 .channelDisabledOverlay span {
@@ -661,14 +667,14 @@
 .createOverlay {
     position: fixed;
     inset: 0;
-    background: var(--overlay-heavy);
-    backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
-    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 110;
     -webkit-app-region: no-drag;
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 85%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
 }
 
 .createOverlayVisible {
@@ -1337,7 +1343,8 @@
 
 @media (prefers-reduced-motion: reduce) {
     .channelItem,
-    .tbTabsSlider {
+    .tbTabsSlider,
+    .tbTab {
         transition: none;
     }
     .channelItem {

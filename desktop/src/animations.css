@@ -226,18 +226,17 @@
 }
 
 
-/* ── Tab Cross-Dissolve（Apple HIG segmented control 内容切换）──
-    旧内容淡出 + 新内容淡入，同步播放形成交叉溶解。
-    --tab-dissolve-duration 控制时长（默认 150ms，比 slider 250ms 短，
-    让内容切换"跟手"而非"拖沓"）。 */
-@keyframes hana-tab-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+/* ── 全页切换过渡 ──
+    旧内容缩小淡出 + 新内容放大淡入，形成推拉深度感，
+    让 tab 切换和 session 切换都获得"整个界面在过渡"的感知。 */
+@keyframes hana-page-in {
+    from { opacity: 0; transform: scale(1.03); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes hana-tab-fade-out {
-    from { opacity: 1; }
-    to   { opacity: 0; }
+@keyframes hana-page-out {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.97); }
 }
 
 

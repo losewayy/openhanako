@@ -5,11 +5,13 @@
  * 在 useEffect 中绑定 resize handle 事件，并在 unmount 时完整清理。
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useStore } from '../stores';
 
 export function useSidebarResize(): void {
-  const rafIdRef = useRef<number | null>(null);
+  // 依赖 locale 确保 i18n 加载后侧边栏 DOM 已就绪再绑定 resize handler。
+  // locale 初始为 ''，App 会 return null；locale 加载后重新渲染才出现侧边栏元素。
+  const locale = useStore(s => s.locale);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -113,25 +115,15 @@ export function useSidebarResize(): void {
         handle.classList.add('active');
         document.body.classList.add('resizing');
 
-        function onMove(e: MouseEvent): void {
-          if (rafIdRef.current) return;
-          rafIdRef.current = requestAnimationFrame(() => {
-            const delta = isRight ? startX - e.clientX : e.clientX - startX;
-            const w = Math.max(min, Math.min(max, startW + delta));
-            console.log('[resize]', { startX, clientX: e.clientX, delta, startW, w, storageKey });
-            liveWidth = w;
-            setWidth(w);
-            const rect = handle!.getBoundingClientRect();
-            handle!.style.setProperty('--handle-y', (e.clientY - rect.top) + 'px');
-            rafIdRef.current = null;
-          });
+        function onMove(ev: MouseEvent): void {
+          const delta = isRight ? startX - ev.clientX : ev.clientX - startX;
+          const w = Math.max(min, Math.min(max, startW + delta));
+          console.log('[resize]', { startX, clientX: ev.clientX, delta, startW, w, storageKey });
+          liveWidth = w;
+          setWidth(w);
         }
 
         function onUp(): void {
-          if (rafIdRef.current) {
-            cancelAnimationFrame(rafIdRef.current);
-            rafIdRef.current = null;
-          }
           handle!.classList.remove('active');
           document.body.classList.remove('resizing');
           handle!.style.setProperty('--handle-y', '-999px');
@@ -202,5 +194,5 @@ export function useSidebarResize(): void {
     return () => {
       for (const cleanup of cleanupFns) cleanup();
     };
-  }, []);
+  }, [locale]);
 }

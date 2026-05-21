@@ -3,8 +3,9 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(var(--glass-blur-sm));
+  background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.3)) 85%, transparent);
+  backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
   -webkit-app-region: no-drag;
 }
 

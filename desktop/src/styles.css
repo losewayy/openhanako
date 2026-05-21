@@ -158,7 +158,15 @@
     /* ── 玻璃态效果 ── */
     --glass-blur-sm: 4px;
     --glass-blur-md: 8px;
-    --glass-blur-lg: 12px;
+    --glass-blur-lg: 16px;
+    --glass-blur-xl: 24px;
+
+    /* ── 玻璃态语义 Token（主题可 override）── */
+    --glass-saturate: 160%;
+    --glass-brightness: 1.05;
+    --glass-bg: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     /* ── 叠层 Token ── */
     --overlay-subtle: rgba(0,0,0,0.04);
@@ -699,6 +707,15 @@ html[data-platform="linux"] .tb-toggle-right {
     position: relative; /* 给 drop overlay 定位 */
 }
 
+/* Tab 内容页壳 — 交叉溶解动画容器 */
+.tab-page-shell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+}
+
 /* ========================================
    侧边栏
    ======================================== */
@@ -711,7 +728,6 @@ html[data-platform="linux"] .tb-toggle-right {
     background-color: var(--sidebar-bg, var(--bg));
     border-right: none;
     padding-top: 40px; /* 给 titlebar 留空间 */
-    overflow: clip;
     contain: style;
     transition: width var(--duration-slow) var(--ease-out),
                 border-color var(--duration-slow) var(--ease-out);
@@ -720,6 +736,8 @@ html[data-platform="linux"] .tb-toggle-right {
 
 .sidebar.collapsed {
     width: 0;
+    min-width: 0;
+    overflow: clip;
     border-right-color: transparent;
 }
 
@@ -730,6 +748,7 @@ html[data-platform="linux"] .tb-toggle-right {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
     height: 100%;
+    overflow: clip;
     opacity: 1;
     transition: opacity var(--duration-fast) var(--ease-out);
 }
@@ -737,6 +756,8 @@ html[data-platform="linux"] .tb-toggle-right {
 .sidebar.collapsed .sidebar-inner {
     opacity: 0;
     pointer-events: none;
+    width: 0;
+    min-width: 0;
 }
 
 .sidebar-header {
@@ -1670,8 +1691,9 @@ html[data-platform="linux"] .tb-toggle-right {
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(var(--glass-blur-sm));
+    background: var(--glass-bg, rgba(0, 0, 0, 0.25));
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2417,7 +2439,6 @@ html[data-platform="linux"] .tb-toggle-right {
     display: flex;
     flex-direction: column;
     padding-top: 40px;
-    overflow: clip;
     contain: style;
     transition: width var(--duration-slow) var(--ease-out);
     z-index: 10;
@@ -2425,6 +2446,13 @@ html[data-platform="linux"] .tb-toggle-right {
 
 .jian-sidebar.collapsed {
     width: 0;
+    min-width: 0;
+    overflow: clip;
+}
+
+.jian-sidebar.collapsed .jian-sidebar-inner {
+    width: 0;
+    min-width: 0;
 }
 
 .jian-sidebar-inner {
@@ -2433,7 +2461,7 @@ html[data-platform="linux"] .tb-toggle-right {
     width: var(--jian-sidebar-width);
     min-width: var(--jian-sidebar-width);
     height: 100%;
-    overflow: hidden;
+    overflow: clip;
     padding: 10px 7px 7px 0;
     box-shadow: var(--shadow-lg);
 }
@@ -2680,10 +2708,12 @@ body.resizing .channel-inspector-rail {
     align-items: center;
     gap: var(--space-sm);
     padding: 12px 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--glass-bg, var(--bg-card));
+    border: 1px solid var(--glass-border, var(--border));
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--glass-inset-highlight, none), var(--shadow-lg);
+    backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     animation: hana-toast-enter 0.3s var(--ease-spring);
 }
 
@@ -2812,7 +2842,8 @@ body.resizing .channel-inspector-rail {
     inset: 0;
     z-index: 80;
     background: var(--drop-overlay-bg, rgba(244, 240, 228, 0.85));
-    backdrop-filter: blur(var(--glass-blur-sm));
+    backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     pointer-events: none;
 }
 

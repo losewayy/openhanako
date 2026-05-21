@@ -12,6 +12,11 @@
     --bg-glass:     rgba(251, 247, 238, 0.92);
     --sidebar-bg:   #EFE8DB;                    /* paper-2 · 侧边更深一层 */
 
+    /* ─── 玻璃态语义（纸色 tint）─── */
+    --glass-bg: rgba(251, 247, 238, 0.82);
+    --glass-border: rgba(251, 247, 238, 0.25);
+    --glass-inset-highlight: inset 0 1px 0 rgba(251, 247, 238, 0.3);
+
     /* ─── 墨 5 档 ─── */
     --text:         #2A2622;                    /* 浓墨 */
     --text-light:   #4A433C;                    /* 二级 */

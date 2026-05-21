@@ -211,7 +211,7 @@ const dlog = initDebugLog(path.join(hanakoHome, "logs"));
 log.log("② 创建 HanaEngine...");
 const engine = new HanaEngine({ hanakoHome, productDir, appVersion });
 log.log("② HanaEngine 构造完成，开始 init...");
-await engine.init((msg) => log.log(msg));
+await engine.init(log);
 log.log("② engine.init 完成");
 dlog.log("server", "engine initialized");
 

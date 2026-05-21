@@ -123,6 +123,7 @@
     "appId": "com.hanako.app",
     "productName": "Hanako",
     "asar": true,
+    "npmRebuild": false,
     "afterPack": "./scripts/fix-modules.cjs",
     "extraMetadata": {
       "main": "desktop/bootstrap.cjs"

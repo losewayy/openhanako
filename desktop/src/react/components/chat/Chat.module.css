@@ -1279,6 +1279,7 @@
     right: 0;
     bottom: calc(var(--chat-scrollbar-bottom-inset) + var(--space-lg));
     overflow: hidden;
+    transition: opacity 250ms var(--ease-out);
 }
 
 .sessionPanel {

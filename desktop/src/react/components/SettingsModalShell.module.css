@@ -11,9 +11,9 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  background: rgba(20, 18, 14, 0);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: color-mix(in srgb, var(--glass-bg, rgba(20,18,14,0.5)) 0%, transparent);
+  backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+  -webkit-backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
   opacity: 0;
   transition:
     opacity var(--settings-modal-open-dur) var(--settings-modal-open-ease),
@@ -22,7 +22,7 @@
 }
 
 .overlay.open {
-  background: rgba(20, 18, 14, 0.18);
+  background: color-mix(in srgb, var(--glass-bg, rgba(20,18,14,0.5)) 28%, transparent);
   opacity: 1;
 }
 

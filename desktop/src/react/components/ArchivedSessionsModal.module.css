@@ -2,19 +2,19 @@
   position: fixed;
   inset: 0;
   padding: var(--space-lg);
-  background: var(--overlay-heavy);
-  backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+  -webkit-backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 85%, transparent);
 }
 
 .modal {
-  background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
+  background: var(--glass-bg, color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%));
   color: var(--text, #3b3d3f);
-  border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--glass-border, var(--overlay-light, rgba(0, 0, 0, 0.08)));
   border-radius: var(--radius-lg, 14px);
   width: min(700px, calc(100vw - 64px));
   max-height: min(72vh, 620px);
@@ -22,7 +22,9 @@
   flex-direction: column;
   overflow: hidden;
   font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
-  box-shadow:
+  backdrop-filter: blur(var(--glass-blur-sm, 4px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm, 4px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+  box-shadow: var(--glass-inset-highlight, none),
     0 4px 8px rgba(0,0,0,0.04),
     0 12px 24px rgba(0,0,0,0.08),
     0 24px 48px rgba(0,0,0,0.14);

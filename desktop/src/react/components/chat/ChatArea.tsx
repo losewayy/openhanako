@@ -199,7 +199,7 @@ const Panel = memo(function Panel({ path, active }: { path: string; active: bool
     <div
       className={styles.sessionShell}
       style={{
-        visibility: active ? 'visible' : 'hidden',
+        opacity: active ? 1 : 0,
         zIndex: active ? 1 : 0,
         pointerEvents: active ? 'auto' : 'none',
       }}

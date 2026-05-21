@@ -605,11 +605,13 @@
 .agent-create-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(4px);
     display: none;
     align-items: center;
     justify-content: center;
+    z-index: 100;
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 35%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     z-index: 110;
 }
 
@@ -748,8 +750,8 @@
     background:
         radial-gradient(circle at 50% 42%, rgba(246, 240, 231, 0.1), transparent 48%),
         rgba(19, 21, 22, 0.82);
-    backdrop-filter: blur(18px) saturate(0.7);
-    -webkit-backdrop-filter: blur(18px) saturate(0.7);
+    backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(0.7) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-xl, 24px)) saturate(0.7) brightness(var(--glass-brightness, 1.05));
     -webkit-app-region: no-drag;
     display: flex;
     align-items: center;
@@ -1312,11 +1314,13 @@
 .agent-delete-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(4px);
     display: none;
     align-items: center;
     justify-content: center;
+    z-index: 100;
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 35%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     z-index: 110;
 }
 
@@ -2173,8 +2177,9 @@
     align-items: center;
     justify-content: center;
     padding: var(--space-xl);
-    background: rgba(21, 23, 24, 0.24);
-    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--glass-bg, rgba(21,23,24,0.5)) 24%, transparent);
+    backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
 }
 
 .skill-bundle-dialog {
@@ -2985,8 +2990,8 @@
     font-size: 0.82rem;
     color: white;
     background: color-mix(in srgb, var(--accent) 70%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md, 8px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     border: 1px solid rgba(var(--accent-rgb), 0.25);
     border-radius: var(--radius-card, 10px);
     cursor: pointer;
@@ -5051,8 +5056,9 @@ a.about-link:hover {
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 30%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     align-items: center;
     justify-content: center;
 }
@@ -5135,8 +5141,9 @@ a.about-link:hover {
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 30%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     align-items: center;
     justify-content: center;
 }
@@ -5314,7 +5321,6 @@ a.about-link:hover {
     color: var(--text-muted);
 }
 
-
 /* ========================================
    头像裁剪弹窗
    ======================================== */
@@ -5324,10 +5330,11 @@ a.about-link:hover {
     position: fixed;
     inset: 0;
     z-index: 110;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
     align-items: center;
     justify-content: center;
+    background: color-mix(in srgb, var(--glass-bg, rgba(0,0,0,0.5)) 45%, transparent);
+    backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 16px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
 }
 
 .crop-overlay.visible {

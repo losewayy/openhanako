@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import type { TabType } from '../../types';
 import { useStore } from '../../stores';
 import { ActivityPanel } from '../ActivityPanel';
@@ -128,19 +129,91 @@ function PluginPage({ pluginId }: { pluginId: string }) {
 export function AppPages() {
   const currentTab = useStore(s => s.currentTab);
   const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
+  const prevTabRef = useRef<TabType>(currentTab);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const channelsRef = useRef<HTMLDivElement>(null);
+  const pluginRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (prevTabRef.current === currentTab) return;
+    const prevTab = prevTabRef.current;
+    prevTabRef.current = currentTab;
+
+    const TRANSITION = 200;
+    const prevIsPlugin = typeof prevTab === 'string' && prevTab.startsWith('plugin:');
+    const prevEl = prevTab === 'chat' ? chatRef.current
+      : prevTab === 'channels' ? channelsRef.current
+      : prevIsPlugin ? pluginRef.current : null;
+    const nextEl = currentTab === 'chat' ? chatRef.current
+      : currentTab === 'channels' ? channelsRef.current
+      : isPluginTab ? pluginRef.current : null;
+
+    if (prevEl) {
+      prevEl.style.animation = `hana-page-out ${TRANSITION}ms cubic-bezier(0.2, 0, 0, 1) forwards`;
+    }
+    if (nextEl) {
+      nextEl.style.animation = `hana-page-in ${TRANSITION}ms cubic-bezier(0.2, 0, 0, 1) forwards`;
+      nextEl.style.pointerEvents = 'auto';
+    }
+    const t = setTimeout(() => {
+      if (prevEl) { prevEl.style.animation = ''; prevEl.style.pointerEvents = 'none'; }
+      if (nextEl) { nextEl.style.animation = ''; }
+    }, TRANSITION);
+    return () => clearTimeout(t);
+  }, [currentTab, isPluginTab]);
+
+  const showChat = currentTab === 'chat';
+  const showChannels = currentTab === 'channels';
+  const showPlugin = isPluginTab;
 
   return (
     <>
       <MainContent>
-        {currentTab === 'chat' && <ChatPage />}
-        {currentTab === 'channels' && <ChannelPage />}
-        {isPluginTab && <PluginPage pluginId={currentTab.slice(7)} />}
+        <div
+          ref={chatRef}
+          className="tab-page-shell"
+          style={{
+            opacity: showChat ? 1 : 0,
+            pointerEvents: showChat ? 'auto' : 'none',
+            position: !showChat ? 'absolute' : undefined,
+            inset: !showChat ? 0 : undefined,
+            zIndex: !showChat ? -1 : undefined,
+          }}
+        >
+          <ChatPage />
+        </div>
+        <div
+          ref={channelsRef}
+          className="tab-page-shell"
+          style={{
+            opacity: showChannels ? 1 : 0,
+            pointerEvents: showChannels ? 'auto' : 'none',
+            position: !showChannels ? 'absolute' : undefined,
+            inset: !showChannels ? 0 : undefined,
+            zIndex: !showChannels ? -1 : undefined,
+          }}
+        >
+          <ChannelPage />
+        </div>
+        <div
+          ref={pluginRef}
+          className="tab-page-shell"
+          style={{
+            opacity: showPlugin ? 1 : 0,
+            pointerEvents: showPlugin ? 'auto' : 'none',
+            position: !showPlugin ? 'absolute' : undefined,
+            inset: !showPlugin ? 0 : undefined,
+            zIndex: !showPlugin ? -1 : undefined,
+          }}
+        >
+          {isPluginTab && <PluginPage pluginId={currentTab.slice(7)} />}
+        </div>
         <ActivityPanel />
         <AutomationPanel />
         <BridgePanel />
       </MainContent>
 
-      {currentTab === 'chat' && <PreviewPanel />}
+      {showChat && <PreviewPanel />}
       <WorkspaceCompanionRail />
     </>
   );

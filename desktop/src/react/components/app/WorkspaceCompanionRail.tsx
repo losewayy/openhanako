@@ -10,12 +10,12 @@ export function WorkspaceCompanionRail() {
     <>
       <WorkspaceFileWatchBridge />
       <aside className={`jian-sidebar${jianOpen ? '' : ' collapsed'}`} id="jianSidebar">
-        <div className="resize-handle resize-handle-left" id="jianResizeHandle"></div>
         <div className="jian-sidebar-inner">
           <RegionalErrorBoundary region="right-workspace">
             <RightWorkspacePanel />
           </RegionalErrorBoundary>
         </div>
+        <div className="resize-handle resize-handle-left" id="jianResizeHandle"></div>
       </aside>
     </>
   );

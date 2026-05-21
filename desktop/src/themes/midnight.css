@@ -9,6 +9,11 @@
     --bg-card:      #445560;
     --bg-glass:     rgba(59, 74, 84, 0.92);
 
+    /* ─── 玻璃态语义（暗色 tint）─── */
+    --glass-bg: rgba(59, 74, 84, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
     /* 主色调（冷雾蓝） */
     --accent:       #7AA2C4;
     --accent-hover: #8FB5D0;

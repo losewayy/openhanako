@@ -312,8 +312,8 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--overlay-light);
     background: var(--bg-glass, rgba(255, 253, 247, 0.72));
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg, 12px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
+    backdrop-filter: blur(var(--glass-blur-lg, 12px)) saturate(var(--glass-saturate, 160%)) brightness(var(--glass-brightness, 1.05));
     box-shadow: 0 4px 14px var(--shadow, rgba(0, 0, 0, 0.08));
     color: var(--text-muted);
     font-family: var(--font-ui);

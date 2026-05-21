@@ -96,7 +96,7 @@ export class AgentManager {
 
   // ── Init ──
 
-  async initAllAgents(log, startId) {
+  async initAllAgents({ log, startId }) {
     this._activeAgentId = startId;
 
     const entries = this._scanAgentDirs();
