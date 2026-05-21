@@ -735,11 +735,7 @@ html[data-platform="linux"] .tb-toggle-right {
 }
 
 .sidebar.collapsed {
-    width: 0;
-    min-width: 0;
-    flex: 0 0 0;
-    overflow: clip;
-    border-right-color: transparent;
+    display: none;
 }
 
 /* 内部内容不跟着缩 */
@@ -2447,10 +2443,7 @@ html[data-platform="linux"] .tb-toggle-right {
 }
 
 .jian-sidebar.collapsed {
-    width: 0;
-    min-width: 0;
-    flex: 0 0 0;
-    overflow: clip;
+    display: none;
 }
 
 .jian-sidebar.collapsed .jian-sidebar-inner {
