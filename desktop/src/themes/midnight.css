@@ -107,12 +107,6 @@
         radial-gradient(ellipse 400px 400px at 0% 100%, rgba(122, 162, 196, 0.12) 0%, transparent 60%);
 }
 
-/* 青夜：用户消息实心卡片，不穿透织物纹理 */
-[data-theme="midnight"] .messageUser {
-    background: var(--bg-card);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
 [data-theme="midnight"] .jian-card,
 [data-theme="midnight"] .provider-card {
     background: linear-gradient(
