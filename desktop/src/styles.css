@@ -737,6 +737,7 @@ html[data-platform="linux"] .tb-toggle-right {
 .sidebar.collapsed {
     width: 0;
     min-width: 0;
+    flex: 0 0 0;
     overflow: clip;
     border-right-color: transparent;
 }
@@ -750,6 +751,7 @@ html[data-platform="linux"] .tb-toggle-right {
     height: 100%;
     overflow: clip;
     opacity: 1;
+    box-shadow: var(--shadow-lg);
     transition: opacity var(--duration-fast) var(--ease-out);
 }
 
@@ -2447,6 +2449,7 @@ html[data-platform="linux"] .tb-toggle-right {
 .jian-sidebar.collapsed {
     width: 0;
     min-width: 0;
+    flex: 0 0 0;
     overflow: clip;
 }
 
