@@ -168,17 +168,17 @@ export const UserMessage = memo(function UserMessage({
          data-message-id={message.id}>
       {showAvatar && !hideIdentity && (
         <div className={`${styles.avatarRow} ${styles.avatarRowUser}`}>
+          <AgentAvatar
+            info={userDisplayInfo}
+            className={`${styles.avatar} ${styles.userAvatar}`}
+            alt={userName}
+          />
           <span className={styles.avatarName}>{userName}</span>
           {isValidTimestamp(message.timestamp) && (
             <span className={styles.avatarTime}>
               {formatMessageTime(message.timestamp)}
             </span>
           )}
-          <AgentAvatar
-            info={userDisplayInfo}
-            className={`${styles.avatar} ${styles.userAvatar}`}
-            alt={userName}
-          />
         </div>
       )}
       {message.quotedText && (

@@ -136,17 +136,17 @@ export const AssistantMessage = memo(function AssistantMessage({
          data-message-id={message.id}>
       {showAvatar && (
         <div className={styles.avatarRow}>
-          <AgentAvatar
-            info={displayInfo}
-            className={`${styles.avatar} ${styles.hanaAvatar}`}
-            alt={displayName}
-          />
-          <span className={styles.avatarName}>{displayName}</span>
           {isValidTimestamp(message.timestamp) && (
             <span className={styles.avatarTime}>
               {formatMessageTime(message.timestamp)}
             </span>
           )}
+          <span className={styles.avatarName}>{displayName}</span>
+          <AgentAvatar
+            info={displayInfo}
+            className={`${styles.avatar} ${styles.hanaAvatar}`}
+            alt={displayName}
+          />
         </div>
       )}
       <div className={`${styles.message} ${styles.messageAssistant}`}>
