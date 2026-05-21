@@ -95,7 +95,7 @@
 [data-theme="midnight"] .main-content {
     background-image:
         radial-gradient(ellipse 600px 400px at 80% 0%, rgba(234, 178, 160, 0.12) 0%, transparent 65%),
-        radial-gradient(ellipse 500px 500px at 0% 100%, rgba(122, 162, 196, 0.06) 0%, transparent 65%);
+        radial-gradient(ellipse 500px 500px at 0% 100%, rgba(122, 162, 196, 0.12) 0%, transparent 65%);
 }
 
 [data-theme="midnight"] .jian-card,
