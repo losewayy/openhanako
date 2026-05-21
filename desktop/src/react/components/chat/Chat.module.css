@@ -88,7 +88,6 @@
     color: var(--text);
     font-size: 0.95rem;
     word-break: break-word;
-    box-shadow: var(--glass-inset-highlight, none);
 }
 
 .messageUser .userText p:last-child {
