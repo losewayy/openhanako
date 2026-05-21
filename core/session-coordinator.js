@@ -756,9 +756,12 @@ export class SessionCoordinator {
         }
         if (metaEntry && Array.isArray(metaEntry.toolNames)) {
           const restoredToolNames = uniqueToolNames(metaEntry.toolNames);
-          snapshotToolNames = restoredToolNames;  // Case A
+          snapshotToolNames = computeToolSnapshot(restoredToolNames, [], {
+            extraDisabled: stableFeatureDisabledToolNames,
+          });  // Case A, with current global feature gates enforced
           shouldPersistRestoredToolNames = restoredToolNames.length !== metaEntry.toolNames.length
-            || restoredToolNames.some((name, index) => name !== metaEntry.toolNames[index]);
+            || restoredToolNames.some((name, index) => name !== metaEntry.toolNames[index])
+            || snapshotToolNames.length !== restoredToolNames.length;
         } else {
           // Legacy sessions created before tool snapshots had no stable tool
           // identity boundary. Establish one on first restore so future plugin

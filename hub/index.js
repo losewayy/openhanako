@@ -48,6 +48,7 @@ export class Hub {
     this._agentPhoneActivities = new AgentPhoneActivityStore({
       emit: (event) => this._eventBus.emit(event, null),
     });
+    this._agentPhoneAbortHandlers = new Set();
 
     // 注入 Hub 回调到 Engine（单向：Hub → Engine，不再双向引用）
     engine.setHubCallbacks({
@@ -56,6 +57,7 @@ export class Hub {
       dmRouter: this._dmRouter,
       channelRouter: this._channelRouter,
       eventBus: this._eventBus,
+      registerAgentPhoneAbortHandler: (handler, meta) => this.registerAgentPhoneAbortHandler(handler, meta),
       pauseForAgentSwitch: () => this.pauseForAgentSwitch(),
       resumeAfterAgentSwitch: () => this.resumeAfterAgentSwitch(),
       triggerChannelDelivery: (name, opts) => this._channelRouter.triggerImmediate(name, opts),
@@ -87,6 +89,27 @@ export class Hub {
   set bridgeManager(bm) { this._bridgeManager = bm; }
 
   get agentPhoneActivities() { return this._agentPhoneActivities; }
+
+  registerAgentPhoneAbortHandler(handler, meta = {}) {
+    if (typeof handler !== "function") return () => {};
+    const entry = { handler, meta };
+    this._agentPhoneAbortHandlers.add(entry);
+    return () => {
+      this._agentPhoneAbortHandlers.delete(entry);
+    };
+  }
+
+  abortAgentPhoneSessions(reason = "phone-disabled") {
+    const entries = [...this._agentPhoneAbortHandlers];
+    for (const { handler } of entries) {
+      try {
+        handler(reason);
+      } catch (err) {
+        log.warn(`agent phone abort handler failed: ${err.message}`);
+      }
+    }
+    return entries.length;
+  }
 
   // ──────────── 订阅 ────────────
 
@@ -296,6 +319,7 @@ export class Hub {
   }
 
   async toggleChannels(enabled) {
+    if (!enabled) this.abortAgentPhoneSessions("channels-disabled");
     return this._channelRouter.toggle(enabled);
   }
 

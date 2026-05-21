@@ -55,6 +55,9 @@ const {
   withForcedLocalProxyBypass,
 } = require("../shared/network-proxy.cjs");
 const {
+  resolveWorkspaceOutputDir,
+} = require("../shared/workspace-output.cjs");
+const {
   applyGpuStartupPolicy,
   buildGpuStartupDiagnostics,
   markGpuStartupFailed,
@@ -3173,7 +3176,7 @@ wrapIpcHandler("screenshot-render", (_event, payload) => {
       const pad = (n) => String(n).padStart(2, "0");
       const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
       const base = payload.saveDir || path.join(os.homedir(), "Desktop");
-      const dir = path.join(base, "截图");
+      const dir = resolveWorkspaceOutputDir(base, "screenshots", payload.locale || "zh");
       const segmentTotal = Number(payload.segmentTotal);
       const segmentIndex = Number(payload.segmentIndex);
       const segmentSuffix = Number.isInteger(segmentTotal) && segmentTotal > 1 && Number.isInteger(segmentIndex) && segmentIndex > 0

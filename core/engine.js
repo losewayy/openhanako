@@ -1573,6 +1573,10 @@ export class HanaEngine {
     if (callbacks?.hub) this._slashSystem?.dispatcher?.setHub(callbacks.hub);
   }
 
+  registerAgentPhoneAbortHandler(handler, meta = {}) {
+    return this._hubCallbacks?.registerAgentPhoneAbortHandler?.(handler, meta) || (() => {});
+  }
+
   setEventBus(bus) {
     for (const fn of this._listeners) bus.subscribe(fn);
     this._listeners.clear();
