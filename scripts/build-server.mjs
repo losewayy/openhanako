@@ -56,8 +56,11 @@ import { copyServerRuntimeAssets } from "./build-server-runtime-assets.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const platform = process.argv[2] || process.platform;
-const arch = process.argv[3] || process.arch;
+// 解析参数：--skip-nft 标志 + 可选的 platform/arch（位置参数）
+const skipNft = process.argv.includes("--skip-nft");
+const positionalArgs = process.argv.slice(2).filter(a => !a.startsWith("--"));
+const platform = positionalArgs[0] || process.platform;
+const arch = positionalArgs[1] || process.arch;
 // electron-builder 的 ${os} 变量：darwin→"mac"、win32→"win"、linux→"linux"
 const osDirName = platform === "darwin" ? "mac" : platform === "win32" ? "win" : platform;
 const outDir = path.join(ROOT, "dist-server", `${osDirName}-${arch}`);
@@ -381,12 +384,30 @@ removeBinDirs(path.join(outDir, "node_modules"));
 
 console.log("[build-server] dependencies installed");
 
-// ── 8. 按文件类型裁剪 node_modules ──
-// 替代 @vercel/nft：不追踪 import 链，只删运行时绝对不会被加载的文件类型
-// （类型声明、源码映射、文档、测试等）。3 秒完成，不耗 5GB 内存。
+// nmDir 始终定义（koffi 清理需要）
 const nmDir = path.join(outDir, "node_modules");
-const { pruneNodeModules } = await import("./prune-node-modules.mjs");
-pruneNodeModules(nmDir);
+
+// ── 8. 裁剪 node_modules ──
+// @vercel/nft 在 Windows 上有三个问题：
+// 1. nodeFileTrace 需 6 分钟，吃 5GB 内存
+// 2. Promise resolve 后 Node 进程不退出（dangling handle）
+// 3. 纯属上游工具 bug，无法修
+// 改用 prune-node-modules.mjs，按文件类型清理，3 秒完成，不吃内存不卡死
+try {
+  const { pruneNodeModules } = await import("./prune-node-modules.mjs");
+  const stat = pruneNodeModules(nmDir);
+  const MB = (n) => (n / 1024 / 1024).toFixed(1);
+  console.log(`[build-server] pruned ${stat.deletedFiles} files, saved ${MB(stat.savedBytes)} MB`);
+} catch (e) {
+  console.warn(`[build-server] prune failed (${e.message}), skipping`);
+}
+
+try {
+  verifyExternalEntrypoints(outDir, Object.keys(externalPkg.dependencies));
+} catch (err) {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+}
 
 // ── 8b. 删除 koffi 多余平台二进制 ──
 // koffi 带了 18 个平台的 .node 文件，nft 全部追踪到了（因为 require 路径指向包根）。

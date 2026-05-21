@@ -6,9 +6,29 @@
  * Windows 上 @vercel/nft 有三个问题：死锁、5GB内存占用、进程不退出。
  * 本脚本按文件类型清理，3秒完成，不吃内存不卡死。
  *
+ * 原理：服务端 Node.js 运行时只会加载以下四种文件类型：
+ *   - .js / .cjs / .mjs  （可执行代码）
+ *   - .json               （配置/数据）
+ *   - .node               （原生 addon）
+ *   - .wasm               （WebAssembly）
+ *
+ * 除此之外的文件类型在运行时不可能被 import/require，可以直接删除。
+ * 按类型清理比 nft 的 AST 追踪快得多（3 秒 vs 6 分钟），
+ * 且不需要 5GB 内存、不会让 Node 进程退不出。
+ *
+ * 精密度差距：nft 能精确到"大包里只用了 3 个 .js 文件，删掉其余 297 个"，本脚本不会。
+ * 在 server 30-40 个 external 依赖的场景下，损失约 10-20MB 体积。
+ *
+ * 安全性：从不删除可执行代码文件，只删类型声明、源码映射、文档、测试等
+ * 运行时绝对不会被加载的内容。符号链接跳过不处理。
+ *
  * 用法：
  *   import { pruneNodeModules } from "./prune-node-modules.mjs";
  *   const stat = pruneNodeModules("/path/to/node_modules");
+ *   console.log(`删除了 ${stat.deletedFiles} 个文件，节省 ${stat.savedBytes} bytes`);
+ *
+ * @param {string} nmDir - node_modules 的绝对路径
+ * @returns {{ deletedFiles: number, savedBytes: number }}
  */
 
 import fs from "fs";
@@ -35,7 +55,6 @@ function isDeletable(filename) {
   if (KEEP_BASENAMES.has(filename)) return false;
   const ext = path.extname(filename);
   if (KEEP_EXTENSIONS.has(ext)) return false;
-  // .d.ts .map .md .txt LICENSE 等
   return true;
 }
 
