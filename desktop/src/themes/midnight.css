@@ -85,18 +85,16 @@
 [data-theme="midnight"] body {
     background-color: var(--bg);
     background-image:
-        radial-gradient(ellipse 600px 400px at 100% 0%, rgba(234, 178, 160, 0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 500px 500px at 0% 100%, rgba(122, 162, 196, 0.04) 0%, transparent 70%);
+        radial-gradient(ellipse 600px 400px at 100% 0%, rgba(234, 178, 160, 0.15) 0%, transparent 65%),
+        radial-gradient(ellipse 500px 500px at 0% 100%, rgba(122, 162, 196, 0.08) 0%, transparent 65%);
 }
 
 [data-theme="midnight"] .jian-card,
-[data-theme="midnight"] .provider-card,
-[data-theme="midnight"] .model-list,
-[data-theme="midnight"] .browser-floating-card {
+[data-theme="midnight"] .provider-card {
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.06) 0%,
-        rgba(255, 255, 255, 0.02) 35%,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.025) 35%,
         transparent 60%
     ), var(--bg-card);
     box-shadow:
