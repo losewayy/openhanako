@@ -60,7 +60,6 @@ export function AgentTab() {
     }
   }, [settingsConfig]);
 
-  const isViewingOther = selectedSettingsAgentId !== currentAgentId;
   const currentYuan = settingsConfig?.agent?.yuan || 'hanako';
 
   // 用 "provider/id" 复合键作为 SelectWidget 的 value，区分多 provider 下同名模型。
@@ -344,7 +343,6 @@ export function AgentTab() {
       <MemorySection
         hasUtilityModel={hasUtilityModel}
         memoryEnabled={memoryEnabled}
-        isViewingOther={isViewingOther}
         currentPins={currentPins}
       />
 

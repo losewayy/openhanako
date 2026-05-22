@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { AppTitlebar } from '../components/app/AppTitlebar';
 import { ChatPage } from '../components/app/ChatPage';
@@ -131,8 +131,18 @@ function MobileDesktopShell({
   const previewOpen = useStore(s => s.previewOpen);
   const mediaViewer = useStore(s => s.mediaViewer);
   const currentTab = useStore(s => s.currentTab);
+  const sessions = useStore(s => s.sessions);
+  const currentSessionPath = useStore(s => s.currentSessionPath);
+  const pendingNewSession = useStore(s => s.pendingNewSession);
   const isNarrow = useNarrowMobileViewport();
   const edgeGestureRef = useRef<MobileEdgeGesture | null>(null);
+  const t = window.t ?? ((p: string) => p);
+
+  const titlebarTitle = useMemo(() => {
+    if (pendingNewSession) return t('sidebar.newChat');
+    const currentSession = sessions.find(session => session.path === currentSessionPath);
+    return currentSession?.title || currentSession?.firstMessage || t('session.untitled');
+  }, [currentSessionPath, pendingNewSession, sessions, t]);
 
   useEffect(() => {
     useStore.setState({ currentTab: 'chat' });
@@ -230,8 +240,11 @@ function MobileDesktopShell({
         jianOpen={jianOpen}
         previewOpen={previewOpen}
         showPreviewToggle
+        showNewSessionButton
         showChannelTabs={false}
         showWidgetButtons={false}
+        centerTitle={titlebarTitle}
+        onNewSession={() => void createNewSession()}
         onToggleSidebar={() => {
           if (!sidebarOpen) useStore.setState({ jianOpen: false });
           toggleSidebar(!sidebarOpen);

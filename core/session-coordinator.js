@@ -63,11 +63,6 @@ function cacheContractDebugEnabled() {
   return process.env.HANA_CACHE_CONTRACT_DEBUG === "1";
 }
 
-function getSteerPrefix() {
-  const isZh = getLocale().startsWith("zh");
-  return isZh ? "（插话，无需 MOOD）\n" : "(Interjection, no MOOD needed)\n";
-}
-
 function assertVideoInputSupported(model, videos) {
   if (!videos?.length) return;
   if (!modelSupportsVideoInput(model)) {
@@ -1041,7 +1036,7 @@ export class SessionCoordinator {
       const entry = this._sessions.get(sp);
       if (entry) entry.lastTouchedAt = Date.now();
     }
-    this._session.steer(getSteerPrefix() + text);
+    this._session.steer(text);
     return true;
   }
 
@@ -1101,7 +1096,7 @@ export class SessionCoordinator {
     const entry = this._sessions.get(sessionPath);
     if (!entry?.session.isStreaming) return false;
     entry.lastTouchedAt = Date.now();
-    entry.session.steer(getSteerPrefix() + text);
+    entry.session.steer(text);
     return true;
   }
 
