@@ -1225,7 +1225,7 @@ html[data-platform="linux"] .tb-toggle-right {
 .md-content pre {
     background: var(--overlay-subtle);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     padding: var(--space-sm) var(--space-md);
     margin: var(--space-sm) 0;
     overflow-x: auto;
@@ -1256,27 +1256,27 @@ html[data-platform="linux"] .tb-toggle-right {
 /* 代码块复制按钮 */
 .md-content pre .copy-btn {
     position: absolute;
-    top: 0.35rem;
-    right: 0.35rem;
+    top: 0;
+    right: 0;
     font-family: inherit;
     font-size: 0.68rem;
     color: var(--text-muted);
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.15rem 0.45rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0 var(--radius-md) 0 var(--radius-sm);
+    padding: 0.25rem 0.5rem;
     cursor: pointer;
     opacity: 0;
     transition: opacity var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast) var(--ease-out);
 }
 
 .md-content pre:hover .copy-btn {
-    opacity: 1;
+    opacity: 0.56;
 }
 
 .md-content pre .copy-btn:hover {
     color: var(--accent);
-    border-color: var(--accent);
+    opacity: 1;
 }
 
 .md-content pre .copy-btn.copied {
@@ -2247,7 +2247,6 @@ html[data-platform="linux"] .tb-toggle-right {
 .sv-content .md-content {
     font-family: 'Songti SC', 'Georgia', serif;
     line-height: 1.75;
-    max-width: 720px;
 }
 
 .sv-content .md-content h1 { text-align: center; }
@@ -2257,7 +2256,6 @@ html[data-platform="linux"] .tb-toggle-right {
     margin-bottom: 20px;
     background: var(--tool-bg, rgba(0,0,0,0.025));
     border-radius: 8px;
-    max-width: 720px;
 }
 
 .sv-description-label {
@@ -2403,7 +2401,7 @@ html[data-platform="linux"] .tb-toggle-right {
 .main-content.welcome-mode .chat-area {
     flex: 0 0 auto;
     overflow: visible;
-    padding-top: calc(18vh + 1.6em);
+    padding-top: calc(18vh + 1.6em + 1lh);
     padding-bottom: var(--space-md);
 }
 

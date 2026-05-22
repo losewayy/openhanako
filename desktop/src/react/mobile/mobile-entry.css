@@ -560,28 +560,33 @@ html[data-platform="linux"] .tb-toggle-right {
     padding: var(--space-sm) var(--space-md);
     overflow-x: auto;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--overlay-subtle);
     line-height: 1.5;
 }
 
 .md-content pre .copy-btn {
     position: absolute;
-    top: 0.35rem;
-    right: 0.35rem;
-    padding: 0.15rem 0.45rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--bg-card);
+    top: 0;
+    right: 0;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: 0 var(--radius-md) 0 var(--radius-sm);
+    background: transparent;
     color: var(--text-muted);
     font: inherit;
     font-size: 0.68rem;
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+    transition: opacity var(--duration-fast), color var(--duration-fast);
 }
 
 .md-content pre:hover .copy-btn {
+    opacity: 0.56;
+}
+
+.md-content pre .copy-btn:hover {
+    color: var(--accent);
     opacity: 1;
 }
 
@@ -745,7 +750,7 @@ html[data-platform="linux"] .tb-toggle-right {
 .main-content.welcome-mode .chat-area {
     flex: 0 0 auto;
     overflow: visible;
-    padding-top: calc(18vh + 1.6em);
+    padding-top: calc(18vh + 1.6em + 1lh);
     padding-bottom: var(--space-md);
 }
 

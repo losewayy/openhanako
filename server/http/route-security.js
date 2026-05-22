@@ -33,6 +33,7 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
 
   if (isMobileStaticRoute(verb, routePath)) return PUBLIC;
   if (isWebAuthBootstrapRoute(verb, routePath)) return PUBLIC;
+  if (isHtmlPreviewDocumentRoute(verb, routePath)) return PUBLIC;
 
   if (routePath === "/api/health") return AUTHENTICATED_ONLY;
   if (routePath === "/api/server/identity") return AUTHENTICATED_ONLY;
@@ -64,6 +65,9 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
     if (verb === "GET") return scoped("files.read");
     if (verb === "PUT") return scoped("files.write");
     return LOCAL_ONLY;
+  }
+  if (routePath === "/api/preview/html") {
+    return verb === "POST" ? scoped("files.read") : LOCAL_ONLY;
   }
   if (isDeskFileReadRoute(verb, routePath)) return scoped("files.read");
   if (isDeskFileWriteRoute(verb, routePath)) return scoped("files.write");
@@ -177,6 +181,11 @@ function isWebAuthBootstrapRoute(verb, routePath) {
   if (routePath === "/api/web-auth/session") return verb === "GET";
   if (routePath === "/api/web-auth/logout") return verb === "POST";
   return false;
+}
+
+function isHtmlPreviewDocumentRoute(verb, routePath) {
+  if (verb !== "GET" && verb !== "HEAD") return false;
+  return /^\/preview\/html\/[^/]+$/.test(routePath);
 }
 
 function isSettingsReadRoute(verb, routePath) {

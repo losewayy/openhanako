@@ -213,6 +213,31 @@ describe("HTTP route security policy", () => {
     })).toMatchObject({ allowed: true });
   });
 
+  it("allows scoped clients to register isolated HTML previews without exposing the rendered document API", async () => {
+    const { authorizeHttpRoute, classifyHttpRoute } = await import("../server/http/route-security.js");
+    const reader = devicePrincipal(["files.read"]);
+    const chatOnly = devicePrincipal(["chat"]);
+
+    expect(authorizeHttpRoute({
+      method: "POST",
+      path: "/api/preview/html",
+      principal: reader,
+    })).toMatchObject({ allowed: true });
+    expect(authorizeHttpRoute({
+      method: "POST",
+      path: "/api/preview/html",
+      principal: chatOnly,
+    })).toMatchObject({ allowed: false, error: "insufficient_scope" });
+
+    expect(classifyHttpRoute({ method: "GET", path: "/preview/html/pv_123" }))
+      .toMatchObject({ kind: "public" });
+    expect(authorizeHttpRoute({
+      method: "GET",
+      path: "/preview/html/pv_123?previewToken=preview_only",
+      principal: null,
+    })).toMatchObject({ allowed: true });
+  });
+
   it("defaults unknown API routes to local-only until they are explicitly classified", async () => {
     const { authorizeHttpRoute } = await import("../server/http/route-security.js");
 
